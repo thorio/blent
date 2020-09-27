@@ -1,6 +1,7 @@
 using Blent.Utility;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 
@@ -11,19 +12,32 @@ namespace Blent.Interop
 		public const string Command = "docker";
 		public const string ComDockerComposeProject = "com.docker.compose.project";
 
-		public static string Run(string arguments)
+		public static ProcessResults Run(string arguments, bool printOutput = false, bool printErrors = true)
 		{
 			var process = Process.Start(new ProcessStartInfo()
 			{
 				FileName = Command,
 				Arguments = arguments,
-				RedirectStandardOutput = true,
+				RedirectStandardOutput = !printOutput,
+				RedirectStandardError = !printErrors,
 			});
 			process.WaitForExit();
-			return process.StandardOutput.ReadToEnd();
+			return new ProcessResults(process.ExitCode, process.StandardOutput.ReadToEnd());
 		}
 
-		public static string Inspect(IEnumerable<string> containers, string format = null, string additionalArguments = "")
+		public static bool IsRunning()
+		{
+			try
+			{
+				return Run("info", false, false).ExitCode == 0;
+			}
+			catch (Win32Exception)
+			{
+				return false;
+			}
+		}
+
+		public static ProcessResults Inspect(IEnumerable<string> containers, string format = null, string additionalArguments = "")
 		{
 			var arguments = $"inspect {string.Join(' ', containers)} {additionalArguments}";
 
@@ -44,7 +58,7 @@ namespace Blent.Interop
 				arguments += $" --filter \"{filter.EscapeDoubleQuotes()}\"";
 			}
 
-			return Run(arguments).AsList(Environment.NewLine);
+			return Run(arguments).Output.AsList(Environment.NewLine);
 		}
 
 		public static IEnumerable<string> GetComposeProjects()
@@ -52,7 +66,7 @@ namespace Blent.Interop
 			var containers = GetContainers($"label={ComDockerComposeProject}");
 			if (!containers.Any()) return new string[0];
 
-			return Inspect(containers, $"{{{{index .Config.Labels \"{ComDockerComposeProject}\"}}}}")
+			return Inspect(containers, $"{{{{index .Config.Labels \"{ComDockerComposeProject}\"}}}}").Output
 				.AsList(Environment.NewLine)
 				.Distinct();
 		}

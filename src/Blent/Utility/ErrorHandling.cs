@@ -1,7 +1,11 @@
+using System;
+
 namespace Blent.Utility
 {
 	public static class ErrorHandling
 	{
+		private const string IssueUrl = "https://github.com/thorio/blent/issues";
+
 		public static void LogWarn(string message) =>
 			Log(message, "WARN", Color.Warning);
 
@@ -11,7 +15,7 @@ namespace Blent.Utility
 		public static void LogFatalAndQuit(string message)
 		{
 			Log(message, "FATAL", Color.Danger);
-			System.Environment.Exit(1);
+			Environment.Exit(1);
 		}
 
 		/// <summary>
@@ -21,6 +25,13 @@ namespace Blent.Utility
 		{
 			LogFatalAndQuit(message);
 			return default;
+		}
+
+		public static void LogException(Exception ex)
+		{
+			Output.Error.Write("UNHANDLED EXCEPTION: ", Color.Danger);
+			Output.Error.WriteLine($"{ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}\n");
+			Output.Error.WriteLine($"Please report this issue at {IssueUrl}", Color.Warning);
 		}
 
 		private static void Log(string message, string level, Color color)
