@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Blent": {
+      "commandName": "Project",
+      "commandLineArgs": "test heimdall -- --force-recreate"
+    }
+  }
+}

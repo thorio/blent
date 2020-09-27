@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Authors>Thorou</Authors>
+		<Company>-</Company>
+		<Version>0.1.0</Version>
+		<PackageLicenseExpression>GPL-3.0</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/thorio/blent#readme</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/thorio/blent.git</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<NeutralLanguage>en</NeutralLanguage>
+
+		<OutputType>Exe</OutputType>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<!--behaves differently on linux, further testing needed-->
+		<!--<PublishTrimmed>true</PublishTrimmed>-->
+		<PublishSingleFile>true</PublishSingleFile>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="commandlineparser" Version="2.8.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.8" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.8" />
+		<PackageReference Include="NetEscapades.Configuration.Yaml" Version="2.0.1" />
+		<PackageReference Include="YamlDotNet" Version="8.1.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="Properties\Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Resources.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="C:\dev\work\blent\.editorconfig" />
+	</ItemGroup>
+
+</Project>
