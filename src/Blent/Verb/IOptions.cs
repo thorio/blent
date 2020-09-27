@@ -1,4 +1,4 @@
-namespace Blent.Verb.Base
+namespace Blent.Verb
 {
 	public interface IOptions
 	{

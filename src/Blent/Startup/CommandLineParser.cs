@@ -1,13 +1,14 @@
-using Blent.Verb.Base;
+using Blent.Verb;
 using CommandLine;
+using CommandLine.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Blent.CommandLineParser
+namespace Blent.Startup
 {
-	public class Parser
+	public class CommandLineParser
 	{
 		private const string ArgumentTerminator = "--";
 
@@ -15,7 +16,7 @@ namespace Blent.CommandLineParser
 		private readonly string[] _args;
 		private readonly string[] _argsRest;
 
-		public Parser(string[] args)
+		public CommandLineParser(string[] args)
 		{
 			_args = args.TakeWhile(a => a != ArgumentTerminator).ToArray();
 			_argsRest = args.SkipWhile(a => a != ArgumentTerminator).Skip(1).ToArray();
@@ -27,7 +28,7 @@ namespace Blent.CommandLineParser
 			switch (GetParser().ParseArguments(_args, GetVerbTypes()))
 			{
 				case Parsed<object> result:
-					RunVerb((IOptions)result.Value);
+					ExecuteVerb((IOptions)result.Value);
 					break;
 				case NotParsed<object> result:
 					PrintHelp(result);
@@ -36,35 +37,27 @@ namespace Blent.CommandLineParser
 			return new Error[0];
 		}
 
-		private CommandLine.Parser GetParser()
+		private Parser GetParser()
 		{
-			return new CommandLine.Parser(p =>
+			return new Parser(p =>
 			{
 				p.HelpWriter = null;
 			});
 		}
 
-		private void RunVerb(IOptions options)
+		private void ExecuteVerb(IOptions options)
 		{
-			ProcessArguments(options);
 			options.Rest = _argsRest;
 
 			var type = options.GetType();
-			_verbs.Single(v => v.GetOptionsType().Equals(type))
-				.Execute(options);
-		}
+			var verb = _verbs.Single(v => v.GetOptionsType().Equals(type));
 
-		private void ProcessArguments(IOptions options)
-		{
-			if (options.AppDirectory != null)
-			{
-				Configuration.Settings.AppDirectory = options.AppDirectory;
-			}
+			VerbExecuter.ExecuteVerb(verb, options);
 		}
 
 		private void PrintHelp(NotParsed<object> result)
 		{
-			var helpText = CommandLine.Text.HelpText.AutoBuild(result, s =>
+			var helpText = HelpText.AutoBuild(result, s =>
 			{
 				s.Heading = "";
 				s.Copyright = "";

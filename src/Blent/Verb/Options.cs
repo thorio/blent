@@ -1,6 +1,6 @@
 using CommandLine;
 
-namespace Blent.Verb.Base
+namespace Blent.Verb
 {
 	public abstract class Options : IOptions
 	{

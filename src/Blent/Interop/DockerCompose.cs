@@ -1,6 +1,7 @@
 using Blent.Configuration;
 using Blent.Utility;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 
 namespace Blent.Interop
@@ -9,23 +10,29 @@ namespace Blent.Interop
 	{
 		private const string Command = "docker-compose";
 
-		public static void Run(string project, string arguments, bool printOutput)
+		public static ProcessResults RunIn(string workingDirectory, string arguments, bool printOutput)
 		{
-			if (!ProjectDirectory.ProjectExists(project))
-			{
-				ErrorHandling.LogError($"Project '{project}' not found.");
-				return;
-			}
-
 			var process = Process.Start(new ProcessStartInfo()
 			{
 				FileName = Command,
-				WorkingDirectory = $"{Settings.AppDirectory}/{project}",
+				WorkingDirectory = workingDirectory ?? System.Environment.CurrentDirectory,
 				Arguments = arguments,
 				RedirectStandardOutput = !printOutput,
 				RedirectStandardError = !printOutput,
 			});
 			process.WaitForExit();
+			return new ProcessResults(process.ExitCode, process.StandardOutput.ReadToEnd());
+		}
+
+		public static ProcessResults Run(string project, string arguments, bool printOutput)
+		{
+			if (!ProjectDirectory.ProjectExists(project))
+			{
+				ErrorHandling.LogError($"Project '{project}' not found.");
+				return null;
+			}
+
+			return RunIn($"{Settings.AppDirectory}/{project}", arguments, printOutput);
 		}
 
 		public static void Run(IEnumerable<string> projects, string arguments, bool printOutput)
@@ -33,6 +40,18 @@ namespace Blent.Interop
 			foreach (var project in projects)
 			{
 				Run(project, arguments, printOutput);
+			}
+		}
+
+		public static bool IsInstalled()
+		{
+			try
+			{
+				return RunIn(null, "-v", false).ExitCode == 0;
+			}
+			catch (Win32Exception)
+			{
+				return false;
 			}
 		}
 

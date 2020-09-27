@@ -5,8 +5,10 @@ using System.Linq;
 
 namespace Blent.Verb.List
 {
-	public class ListVerb : Base.Verb<ListOptions>
+	public class ListVerb : Verb<ListOptions>
 	{
+		public override bool RequiresDocker => true;
+
 		public override void Execute(ListOptions options)
 		{
 			var projects = ProjectDirectory.GetProjects().OrderBy(s => s);
