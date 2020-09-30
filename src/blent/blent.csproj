@@ -11,11 +11,13 @@
 		<NeutralLanguage>en</NeutralLanguage>
 
 		<OutputType>Exe</OutputType>
+		<TargetName>blent</TargetName>
 		<TargetFramework>netcoreapp3.1</TargetFramework>
-		<!--behaves differently on linux, further testing needed-->
-		<!--<PublishTrimmed>true</PublishTrimmed>-->
+		<RuntimeIdentifiers>win-x64;linux-x64;linux-arm;linux-arm64</RuntimeIdentifiers>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
 		<PublishSingleFile>true</PublishSingleFile>
-		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -39,10 +41,6 @@
 			<Generator>PublicResXFileCodeGenerator</Generator>
 			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Remove="C:\dev\work\blent\.editorconfig" />
 	</ItemGroup>
 
 </Project>

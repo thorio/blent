@@ -1,0 +1,45 @@
+skip_tags: true
+image: Visual Studio 2019
+
+install:
+  - ps: buildtools\set-version.ps1
+  - ps: dotnet restore --verbosity m
+  - ps: dotnet tool install --global dotnet-deb
+  - ps: dotnet tool install --global dotnet-tarball
+  - ps: dotnet tool install --global dotnet-zip
+
+dotnet_csproj:
+  patch: true
+  file: src\Blent\Blent.csproj
+  version: $(APPVEYOR_BUILD_VERSION)
+
+build_script:
+  - cmd: mkdir publish
+  - ps: cd src\Blent
+  - ps: dotnet zip -o publish -r win-x64 -c Release
+  - ps: dotnet tarball -o publish -r linux-x64 -c Release
+  - ps: dotnet tarball -o publish -r linux-arm -c Release
+  - ps: dotnet tarball -o publish -r linux-arm64 -c Release
+  - ps: dotnet deb -o publish -r linux-x64 -c Release
+  - ps: dotnet deb -o publish -r linux-arm -c Release
+  - ps: dotnet deb -o publish -r linux-arm64 -c Release
+  - ps: cd ..\..\
+
+artifacts:
+  - path: 'src\Blent\publish\*'
+    name: publish
+
+test: off
+
+deploy:
+- provider: GitHub
+  tag: $(APPVEYOR_BUILD_VERSION)
+  release: Version $(APPVEYOR_BUILD_VERSION)
+  description: 'Changelog:'
+  auth_token:
+    secure: xMcnocRvXpoVccUdQMgu52bjunzTLDzCnxaeum8+74zTMxmRW7+iHD653YEd70VR
+  repository: thorio/blent
+  artifact: publish
+  draft: true
+  on:
+    branch: master
