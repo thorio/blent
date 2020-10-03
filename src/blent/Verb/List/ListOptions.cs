@@ -2,7 +2,7 @@ using CommandLine;
 
 namespace Blent.Verb.List
 {
-	[Verb("list", true, HelpText = "List projects")]
+	[Verb("list", HelpText = "List projects.")]
 	public class ListOptions : Options
 	{
 	}

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Blent.Verb.Logs
 {
-	[Verb("logs", HelpText = "Fetch the logs of a project.")]
+	[Verb("logs", HelpText = "Print logs of a project.")]
 	public class LogsOptions : Options
 	{
 		[Value(0, Required = true, HelpText = "Project to fetch logs for.", MetaName = "project")]
