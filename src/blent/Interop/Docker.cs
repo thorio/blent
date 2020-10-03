@@ -22,7 +22,9 @@ namespace Blent.Interop
 				RedirectStandardError = !printErrors,
 			});
 			process.WaitForExit();
-			return new ProcessResults(process.ExitCode, process.StandardOutput.ReadToEnd());
+
+			var output = printOutput ? null : process.StandardOutput.ReadToEnd();
+			return new ProcessResults(process.ExitCode, output);
 		}
 
 		public static bool IsRunning()
@@ -55,7 +57,7 @@ namespace Blent.Interop
 
 			if (!string.IsNullOrEmpty(filter))
 			{
-				arguments += $" --filter \"{filter.EscapeDoubleQuotes()}\"";
+				arguments += $" -f \"{filter.EscapeDoubleQuotes()}\"";
 			}
 
 			return Run(arguments).Output.AsList(Environment.NewLine);
@@ -71,5 +73,21 @@ namespace Blent.Interop
 				.Distinct();
 		}
 
+		public static IEnumerable<string> GetImages(string filter = null, string additionalArguments = "")
+		{
+			var arguments = $"images -q {additionalArguments}";
+
+			if (!string.IsNullOrEmpty(filter))
+			{
+				arguments += $" -f \"{filter.EscapeDoubleQuotes()}\"";
+			}
+
+			return Run(arguments).Output.AsList(Environment.NewLine);
+		}
+
+		public static void RemoveImages(IEnumerable<string> Ids)
+		{
+			Run($"rmi {string.Join(' ', Ids)}");
+		}
 	}
 }
