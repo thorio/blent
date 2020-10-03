@@ -1,6 +1,5 @@
 using Blent.Verb;
 using CommandLine;
-using CommandLine.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,27 +48,19 @@ namespace Blent.Startup
 		{
 			options.Rest = _argsRest;
 
-			var type = options.GetType();
-			var verb = _verbs.Single(v => v.GetOptionsType().Equals(type));
+			var verb = GetVerb(options.GetType());
 
 			VerbExecuter.ExecuteVerb(verb, options);
 		}
 
 		private void PrintHelp(NotParsed<object> result)
 		{
-			var helpText = HelpText.AutoBuild(result, s =>
-			{
-				s.Heading = "";
-				s.Copyright = "";
-				s.AdditionalNewLineAfterOption = false;
-				return s;
-			}).ToString().Trim(new[] { '\r', '\n' });
-
-			helpText = Environment.NewLine + helpText + Environment.NewLine;
-			helpText = helpText.Replace("ERROR(S):" + Environment.NewLine, "");
-
-			Console.Error.Write(helpText);
+			var verb = GetVerb(result.TypeInfo.Current);
+			HelpPrinter.PrintHelp(verb, result);
 		}
+
+		private IVerb GetVerb(Type type) =>
+			_verbs.SingleOrDefault(v => v.GetOptionsType().Equals(type));
 
 		private List<IVerb> GetVerbs()
 		{

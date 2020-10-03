@@ -7,6 +7,7 @@ namespace Blent.Verb.Update
 	public class UpdateVerb : Verb<UpdateOptions>
 	{
 		public override bool RequiresDocker => true;
+		public override string Usage => "[PROJECT...] [options] [-- docker-compose_up-args]";
 
 		public override void Execute(UpdateOptions options)
 		{

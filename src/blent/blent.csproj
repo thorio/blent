@@ -9,6 +9,7 @@
 		<RepositoryUrl>https://github.com/thorio/blent.git</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<NeutralLanguage>en</NeutralLanguage>
+		<RootNamespace>Blent</RootNamespace>
 
 		<OutputType>Exe</OutputType>
 		<TargetName>blent</TargetName>

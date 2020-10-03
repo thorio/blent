@@ -8,6 +8,7 @@ namespace Blent.Verb.List
 	public class ListVerb : Verb<ListOptions>
 	{
 		public override bool RequiresDocker => true;
+		public override string Usage => null;
 
 		public override void Execute(ListOptions options)
 		{
