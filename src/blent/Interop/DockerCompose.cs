@@ -21,7 +21,9 @@ namespace Blent.Interop
 				RedirectStandardError = !printOutput,
 			});
 			process.WaitForExit();
-			return new ProcessResults(process.ExitCode, process.StandardOutput.ReadToEnd());
+
+			var output = printOutput ? null : process.StandardOutput.ReadToEnd();
+			return new ProcessResults(process.ExitCode, output);
 		}
 
 		public static ProcessResults Run(string project, string arguments, bool printOutput)
@@ -70,6 +72,11 @@ namespace Blent.Interop
 			if (follow) arguments += " -f";
 			if (showTimestamps) arguments += " -t";
 			Run(project, arguments, true);
+		}
+
+		public static void Pull(IEnumerable<string> projects)
+		{
+			Run(projects, "pull", true);
 		}
 	}
 }
