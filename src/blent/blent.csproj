@@ -4,10 +4,6 @@
 		<Authors>Thorou</Authors>
 		<Company>-</Company>
 		<Version>0.1.0</Version>
-		<PackageLicenseExpression>GPL-3.0</PackageLicenseExpression>
-		<PackageProjectUrl>https://github.com/thorio/blent#readme</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/thorio/blent.git</RepositoryUrl>
-		<RepositoryType>git</RepositoryType>
 		<NeutralLanguage>en</NeutralLanguage>
 		<RootNamespace>Blent</RootNamespace>
 
