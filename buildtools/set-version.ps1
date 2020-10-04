@@ -3,8 +3,9 @@
 $version += $csproj.Project.PropertyGroup.Version
 $version = "$version".Trim()
 
-if ($APPVEYOR_REPO_BRANCH -ne "master") {
-   $version += "+b$env:APPVEYOR_BUILD_NUMBER-$env:APPVEYOR_REPO_BRANCH"
+if ($env:APPVEYOR_REPO_BRANCH -ne "master") {
+	$branch = $env:APPVEYOR_REPO_BRANCH -replace '[/]+','-'
+	$version += "-indev+${branch}"
 }
 
 Update-AppveyorBuild -Version "$version"
