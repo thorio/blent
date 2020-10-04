@@ -15,6 +15,7 @@ namespace Blent.Utility
 		public static void LogFatalAndQuit(string message)
 		{
 			Log(message, "FATAL", Color.Danger);
+			PerformanceTesting.Checkpoint("Fatal");
 			Environment.Exit(1);
 		}
 
