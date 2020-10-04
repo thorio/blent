@@ -14,6 +14,7 @@ namespace Blent.Interop
 
 		public static ProcessResults Run(string arguments, bool printOutput = false, bool printErrors = true)
 		{
+			PerformanceTesting.Checkpoint($"Begin Process [docker {arguments.Split(' ').First()}]");
 			var process = Process.Start(new ProcessStartInfo()
 			{
 				FileName = Command,
@@ -24,6 +25,7 @@ namespace Blent.Interop
 			process.WaitForExit();
 
 			var output = printOutput ? null : process.StandardOutput.ReadToEnd();
+			PerformanceTesting.Checkpoint($"End Process docker");
 			return new ProcessResults(process.ExitCode, output);
 		}
 
@@ -31,7 +33,7 @@ namespace Blent.Interop
 		{
 			try
 			{
-				return Run("info", false, false).ExitCode == 0;
+				return Run("version", false, false).ExitCode == 0;
 			}
 			catch (Win32Exception)
 			{

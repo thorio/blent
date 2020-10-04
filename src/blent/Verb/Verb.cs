@@ -21,9 +21,6 @@ namespace Blent.Verb
 
 		public abstract void Execute(TOptions options);
 
-		/// <summary>
-		/// Indicates whether docker and -compose availability should be checked before execution.
-		/// </summary>
 		public abstract bool RequiresDocker { get; }
 
 		public abstract string Usage { get; }

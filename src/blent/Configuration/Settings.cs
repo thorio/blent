@@ -1,3 +1,4 @@
+using Blent.Utility;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 
@@ -18,12 +19,15 @@ namespace Blent.Configuration
 
 		private static UserConfig GetUserConfig()
 		{
+			PerformanceTesting.Checkpoint("Begin Configuration");
 			var defaultConfigFileProvider = new StringFilerProvider(Properties.Resources.default_user_yml);
-			return new ConfigurationBuilder()
+			var config = new ConfigurationBuilder()
 				.AddYamlFile(defaultConfigFileProvider, "default.user.yml", false, false)
 				.AddYamlFile($"{Environment.UserHomeDirectory}/.config/blent/user.yml", true, false)
 				.Build()
 				.Get<UserConfig>();
+			PerformanceTesting.Checkpoint("End Configuration");
+			return config;
 		}
 
 		private static string GetAppDirectory()
@@ -36,7 +40,7 @@ namespace Blent.Configuration
 		{
 			return Directory.Exists(path)
 				? path
-				: Utility.ErrorHandling.LogFatalAndQuit<string>($"AppDirectory [{path}] does not exist.");
+				: ErrorHandling.LogFatalAndQuit<string>($"AppDirectory [{path}] does not exist.");
 		}
 	}
 }

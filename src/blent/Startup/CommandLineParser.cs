@@ -1,3 +1,4 @@
+using Blent.Utility;
 using Blent.Verb;
 using CommandLine;
 using System;
@@ -24,6 +25,7 @@ namespace Blent.Startup
 
 		public IEnumerable<Error> ParseAndExecuteVerb()
 		{
+			PerformanceTesting.Checkpoint("Begin Parse");
 			switch (GetParser().ParseArguments(_args, GetVerbTypes()))
 			{
 				case Parsed<object> result:
@@ -46,6 +48,7 @@ namespace Blent.Startup
 
 		private void ExecuteVerb(IOptions options)
 		{
+			PerformanceTesting.Checkpoint("End Parse");
 			options.Rest = _argsRest;
 
 			var verb = GetVerb(options.GetType());
@@ -55,6 +58,7 @@ namespace Blent.Startup
 
 		private void PrintHelp(NotParsed<object> result)
 		{
+			PerformanceTesting.Checkpoint("Begin Help");
 			var verb = GetVerb(result.TypeInfo.Current);
 			HelpPrinter.PrintHelp(verb, result);
 		}

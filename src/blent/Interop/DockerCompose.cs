@@ -3,6 +3,7 @@ using Blent.Utility;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Blent.Interop
 {
@@ -12,18 +13,28 @@ namespace Blent.Interop
 
 		public static ProcessResults RunIn(string workingDirectory, string arguments, bool printOutput)
 		{
-			var process = Process.Start(new ProcessStartInfo()
+			try
 			{
-				FileName = Command,
-				WorkingDirectory = workingDirectory ?? System.Environment.CurrentDirectory,
-				Arguments = arguments,
-				RedirectStandardOutput = !printOutput,
-				RedirectStandardError = !printOutput,
-			});
-			process.WaitForExit();
+				PerformanceTesting.Checkpoint($"Begin Process [docker-compose {arguments.Split(' ').First()}]");
+				var process = Process.Start(new ProcessStartInfo()
+				{
+					FileName = Command,
+					WorkingDirectory = workingDirectory ?? System.Environment.CurrentDirectory,
+					Arguments = arguments,
+					RedirectStandardOutput = !printOutput,
+					RedirectStandardError = !printOutput,
+				});
+				process.WaitForExit();
 
-			var output = printOutput ? null : process.StandardOutput.ReadToEnd();
-			return new ProcessResults(process.ExitCode, output);
+				var output = printOutput ? null : process.StandardOutput.ReadToEnd();
+				PerformanceTesting.Checkpoint($"End Process docker-compose");
+				return new ProcessResults(process.ExitCode, output);
+			}
+			catch (Win32Exception)
+			{
+				ErrorHandling.LogFatalAndQuit("Docker-compose is not installed.");
+				throw;
+			}
 		}
 
 		public static ProcessResults Run(string project, string arguments, bool printOutput)
@@ -42,18 +53,6 @@ namespace Blent.Interop
 			foreach (var project in projects)
 			{
 				Run(project, arguments, printOutput);
-			}
-		}
-
-		public static bool IsInstalled()
-		{
-			try
-			{
-				return RunIn(null, "-v", false).ExitCode == 0;
-			}
-			catch (Win32Exception)
-			{
-				return false;
 			}
 		}
 

@@ -10,6 +10,7 @@ namespace Blent.Startup
 		{
 			ProcessGlobalArguments(options);
 			PerformChecks(verb);
+			PerformanceTesting.Checkpoint("Begin Verb");
 			verb.Execute(options);
 		}
 
@@ -23,14 +24,12 @@ namespace Blent.Startup
 
 		public static void PerformChecks(IVerb verb)
 		{
+			PerformanceTesting.Checkpoint("Begin Checks");
 			if (verb.RequiresDocker && !Docker.IsRunning())
 			{
 				ErrorHandling.LogFatalAndQuit("Docker daemon is unreachable or not running.");
 			}
-			if (verb.RequiresDocker && !DockerCompose.IsInstalled())
-			{
-				ErrorHandling.LogFatalAndQuit("Docker-compose is not installed.");
-			}
+			PerformanceTesting.Checkpoint("End Docker Check");
 		}
 	}
 }
