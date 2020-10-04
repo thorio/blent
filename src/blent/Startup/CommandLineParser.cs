@@ -43,6 +43,7 @@ namespace Blent.Startup
 			return new Parser(p =>
 			{
 				p.HelpWriter = null;
+				p.AutoVersion = false;
 			});
 		}
 

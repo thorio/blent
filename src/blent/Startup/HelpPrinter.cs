@@ -55,7 +55,10 @@ namespace Blent.Startup
 
 		private static string RenderHelpText(Action<HelpText> configure)
 		{
-			var builder = new HelpText("", "");
+			var builder = new HelpText("", "")
+			{
+				AutoVersion = false,
+			};
 			configure(builder);
 
 			return builder.ToString()
