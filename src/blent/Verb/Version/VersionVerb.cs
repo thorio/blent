@@ -22,10 +22,11 @@ namespace Blent.Verb.Version
 				return;
 			}
 
-			Output.Out.WriteLine($"{name} version {version}");
+			Output.Out.WriteLine($"{name} version {version}, build {Constants.CommitHash.Substring(0, 8)}");
 			Output.Out.WriteLine($"Free Software licensed under {Constants.License}");
 			Output.Out.WriteLine($"Website: {Constants.ProjectUrl}");
 			Output.Out.WriteLine($"Source Code: {Constants.RepositoryUrl}");
+			Output.Out.WriteLine($"Issues: {Constants.IssuesUrl}");
 		}
 	}
 }

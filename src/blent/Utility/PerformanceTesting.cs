@@ -1,12 +1,15 @@
+#if CHECKPERF
 using System.Diagnostics;
+#endif
 
 namespace Blent.Utility
 {
 	public static class PerformanceTesting
 	{
+#if CHECKPERF
 		private static Stopwatch _stopwatch;
 		private static long _previous;
-
+#endif
 		public static void Begin()
 		{
 #if CHECKPERF

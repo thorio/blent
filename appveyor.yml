@@ -3,6 +3,7 @@ image: Visual Studio 2019
 
 install:
   - ps: buildtools\set-version.ps1
+  - ps: buildtools\replace-constants.ps1
   - ps: dotnet restore --verbosity m
   - ps: dotnet tool install --global dotnet-deb
   - ps: dotnet tool install --global dotnet-tarball

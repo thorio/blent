@@ -4,8 +4,6 @@ namespace Blent.Utility
 {
 	public static class ErrorHandling
 	{
-		private const string IssueUrl = "https://github.com/thorio/blent/issues";
-
 		public static void LogWarn(string message) =>
 			Log(message, "WARN", Color.Warning);
 
@@ -32,7 +30,7 @@ namespace Blent.Utility
 		{
 			Output.Error.Write("UNHANDLED EXCEPTION: ", Color.Danger);
 			Output.Error.WriteLine($"{ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}\n");
-			Output.Error.WriteLine($"Please report this issue at {IssueUrl}", Color.Warning);
+			Output.Error.WriteLine($"Please report this issue at {Constants.IssuesUrl}", Color.Warning);
 		}
 
 		private static void Log(string message, string level, Color color)
