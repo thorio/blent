@@ -11,6 +11,7 @@ if (($env:APPVEYOR_REPO_BRANCH -ne "master") -and ($env:APPVEYOR_PULL_REQUEST_HE
 	$pr_branch = $env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH -replace '[^\d\w]+','-'
 	$version += "-pr-${pr_branch}+${sha}"
 }
+echo "|${env:APPVEYOR_PULL_REQUEST_HEAD_COMMIT}|"
 
 try {
 	Update-AppveyorBuild -Version "$version"
