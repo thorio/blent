@@ -4,6 +4,7 @@ image: Visual Studio 2019
 install:
   - ps: buildtools\set-version.ps1
   - ps: buildtools\replace-constants.ps1
+  - ps: buildtools\get-git-log.ps1
   - ps: dotnet restore --verbosity m
   - ps: dotnet tool install --global dotnet-deb
   - ps: dotnet tool install --global dotnet-tarball
@@ -36,7 +37,7 @@ deploy:
 - provider: GitHub
   tag: $(APPVEYOR_BUILD_VERSION)
   release: Version $(APPVEYOR_BUILD_VERSION)
-  description: 'Changelog:'
+  description: Changelog:\n\n---\n$(GIT_LOG_SINCE_TAG)
   auth_token:
     secure: xMcnocRvXpoVccUdQMgu52bjunzTLDzCnxaeum8+74zTMxmRW7+iHD653YEd70VR
   repository: thorio/blent
