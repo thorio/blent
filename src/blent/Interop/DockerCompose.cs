@@ -56,14 +56,20 @@ namespace Blent.Interop
 			}
 		}
 
-		public static void Up(IEnumerable<string> projects, string arguments) =>
-			Run(projects, "up -d " + arguments, true);
+		public static void Up(IEnumerable<string> projects, string additionalArguments, bool detached = true, bool forceRecreate = false)
+		{
+			var arguments = $"up ";
+			if (detached) arguments += "-d ";
+			if (forceRecreate) arguments += "--force-recreate ";
+			Run(projects, arguments + additionalArguments, true);
+		}
 
-		public static void ReUp(IEnumerable<string> projects, string arguments) =>
-			Up(projects, "--force-recreate " + arguments);
-
-		public static void Down(IEnumerable<string> projects, string arguments) =>
-			Run(projects, "down " + arguments, true);
+		public static void Down(IEnumerable<string> projects, string additionalArguments, bool removeOrphans = false)
+		{
+			var arguments = $"down ";
+			if (removeOrphans) arguments += "--remove-orphans ";
+			Run(projects, arguments + additionalArguments, true);
+		}
 
 		public static void Logs(string project, IEnumerable<string> services, bool follow = false, bool showTimestamps = false)
 		{
