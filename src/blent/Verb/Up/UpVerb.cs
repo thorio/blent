@@ -7,7 +7,7 @@ namespace Blent.Verb.Up
 	public class UpVerb : Verb<UpOptions>
 	{
 		public override bool RequiresDocker => true;
-		public override string Usage => "[PROJECT...] [options] [--] [docker-compose_up-options]";
+		public override string Usage => "[PROJECT...] [options] [--] [docker-compose-up_options]";
 
 		public override void Execute(UpOptions options)
 		{
@@ -25,7 +25,7 @@ namespace Blent.Verb.Up
 				return;
 			}
 
-			DockerCompose.Up(projects, string.Join(" ", options.Rest), !options.Attach, options.ForceRecreate);
+			DockerCompose.Up(projects, options.PassthroughArguments, !options.Attach, options.ForceRecreate);
 		}
 	}
 }

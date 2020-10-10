@@ -7,7 +7,7 @@ namespace Blent.Verb.Down
 	public class DownVerb : Verb<DownOptions>
 	{
 		public override bool RequiresDocker => true;
-		public override string Usage => "[PROJECT...] [options] [--] [docker-compose_down-args]";
+		public override string Usage => "[PROJECT...] [options] [--] [docker-compose-down_options]";
 
 		public override void Execute(DownOptions options)
 		{
@@ -23,7 +23,7 @@ namespace Blent.Verb.Down
 				return;
 			}
 
-			DockerCompose.Down(projects, string.Join(" ", options.Rest), options.RemoveOrphans);
+			DockerCompose.Down(projects, options.PassthroughArguments, options.RemoveOrphans);
 		}
 	}
 }

@@ -56,19 +56,19 @@ namespace Blent.Interop
 			}
 		}
 
-		public static void Up(IEnumerable<string> projects, string additionalArguments, bool detached = true, bool forceRecreate = false)
+		public static void Up(IEnumerable<string> projects, string extraArguments = "", bool detached = true, bool forceRecreate = false)
 		{
 			var arguments = $"up ";
 			if (detached) arguments += "-d ";
 			if (forceRecreate) arguments += "--force-recreate ";
-			Run(projects, arguments + additionalArguments, true);
+			Run(projects, arguments + extraArguments, true);
 		}
 
-		public static void Down(IEnumerable<string> projects, string additionalArguments, bool removeOrphans = false)
+		public static void Down(IEnumerable<string> projects, string extraArguments = "", bool removeOrphans = false)
 		{
 			var arguments = $"down ";
 			if (removeOrphans) arguments += "--remove-orphans ";
-			Run(projects, arguments + additionalArguments, true);
+			Run(projects, arguments + extraArguments, true);
 		}
 
 		public static void Logs(string project, IEnumerable<string> services, bool follow = false, bool showTimestamps = false)
@@ -82,6 +82,12 @@ namespace Blent.Interop
 		public static void Pull(IEnumerable<string> projects)
 		{
 			Run(projects, "pull", true);
+		}
+
+		public static void Exec(string project, string service, string command, int serviceIndex = 1, string extraArguments = "")
+		{
+			var arguments = $"exec --index={serviceIndex} {extraArguments} -- {service} {command}";
+			Run(project, arguments, true);
 		}
 	}
 }

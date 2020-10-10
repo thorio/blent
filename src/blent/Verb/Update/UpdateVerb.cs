@@ -7,7 +7,7 @@ namespace Blent.Verb.Update
 	public class UpdateVerb : Verb<UpdateOptions>
 	{
 		public override bool RequiresDocker => true;
-		public override string Usage => "[PROJECT...] [options] [-- docker-compose_up-args]";
+		public override string Usage => "[PROJECT...] [options] [--] [docker-compose-up_options]";
 
 		public override void Execute(UpdateOptions options)
 		{
@@ -21,7 +21,7 @@ namespace Blent.Verb.Update
 			DockerCompose.Pull(projects);
 
 			Output.Out.WriteLine("\nRestarting Projects ...", Color.Info);
-			DockerCompose.Up(projects, string.Join(" ", options.Rest));
+			DockerCompose.Up(projects, options.PassthroughArguments);
 
 			if (options.RemoveDanglingImages)
 			{

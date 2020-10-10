@@ -5,7 +5,7 @@ namespace Blent.Verb
 		/// <summary>
 		/// All arguments after `--`.
 		/// </summary>
-		string[] Rest { get; set; }
+		string PassthroughArguments { get; set; }
 
 		/// <summary>
 		/// See <see cref="Configuration.Settings.AppDirectory"/>.

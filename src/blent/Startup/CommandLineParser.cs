@@ -50,7 +50,7 @@ namespace Blent.Startup
 		private void ExecuteVerb(IOptions options)
 		{
 			PerformanceTesting.Checkpoint("End Parse");
-			options.Rest = _argsRest;
+			options.PassthroughArguments = string.Join(" ", _argsRest);
 
 			var verb = GetVerb(options.GetType());
 
