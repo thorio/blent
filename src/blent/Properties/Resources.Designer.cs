@@ -63,6 +63,16 @@ namespace Blent.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        public static byte[] default_compose_yml {
+            get {
+                object obj = ResourceManager.GetObject("default_compose_yml", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         public static byte[] default_user_yml {
             get {
                 object obj = ResourceManager.GetObject("default_user_yml", resourceCulture);

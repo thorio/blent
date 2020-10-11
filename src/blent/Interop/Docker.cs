@@ -2,7 +2,6 @@ using Blent.Utility;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 
 namespace Blent.Interop
@@ -12,22 +11,8 @@ namespace Blent.Interop
 		public const string Command = "docker";
 		public const string ComDockerComposeProject = "com.docker.compose.project";
 
-		public static ProcessResults Run(string arguments, bool printOutput = false, bool printErrors = true)
-		{
-			PerformanceTesting.Checkpoint($"Begin Process [docker {arguments.Split(' ').First()}]");
-			var process = Process.Start(new ProcessStartInfo()
-			{
-				FileName = Command,
-				Arguments = arguments,
-				RedirectStandardOutput = !printOutput,
-				RedirectStandardError = !printErrors,
-			});
-			process.WaitForExit();
-
-			var output = printOutput ? null : process.StandardOutput.ReadToEnd();
-			PerformanceTesting.Checkpoint($"End Process docker");
-			return new ProcessResults(process.ExitCode, output);
-		}
+		public static ProcessResults Run(string arguments, bool printOutput = false, bool printErrors = true) =>
+			Process.Run(Command, arguments, null, printOutput, printErrors);
 
 		public static bool IsRunning()
 		{
@@ -87,9 +72,7 @@ namespace Blent.Interop
 			return Run(arguments).Output.AsList(Environment.NewLine);
 		}
 
-		public static void RemoveImages(IEnumerable<string> Ids)
-		{
+		public static void RemoveImages(IEnumerable<string> Ids) =>
 			Run($"rmi {string.Join(' ', Ids)}");
-		}
 	}
 }
