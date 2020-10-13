@@ -1,4 +1,6 @@
 using Blent.Configuration;
+using Blent.Interop;
+using Blent.ProjectRepository.Models;
 using Blent.Utility;
 using System.IO;
 
@@ -7,26 +9,51 @@ namespace Blent.ProjectRepository
 	public class Repository
 	{
 		private const string IndexFileName = "index.yml";
-		private const string RepositoriesFolderName = "repositories";
-		private const string DefaultRepositoryName = "default";
+		private const string RepositoriesFolderName = "repos";
+		private const string IndexFileVersion = "unstable";
 
 		private readonly string _repositoryName;
 
-		public Repository()
+		public Repository(string repositoryName)
 		{
-			_repositoryName = DefaultRepositoryName;
+			_repositoryName = repositoryName;
+			Git = new Git(GetBasePath());
 		}
 
-		public Models.RepositoryIndex GetIndex() =>
-			YamlFile<Models.RepositoryIndex>.Read(GetIndexFilePath());
+		public Git Git { get; }
 
-		public YamlFile<Models.RepositoryIndex> OpenIndex() =>
-			YamlFile<Models.RepositoryIndex>.Open(GetIndexFilePath());
+		public static Repository Create(string repositoryName, string remoteUrl)
+		{
+			var repo = new Repository(repositoryName);
+			Directory.CreateDirectory(repo.GetBasePath());
+			repo.Git.Init();
+			repo.Git.AddRemote(remoteUrl);
+			repo.Git.CreateBranch(Constants.RepositoryIndexBranchName);
+
+			using (var indexFile = repo.OpenIndex())
+			{
+				indexFile.Write(new RepositoryIndex { IndexVersion = IndexFileVersion, Projects = new RepositoryIndexProject[0] });
+			}
+
+			repo.Git.CommitAll("CREATE INDEX");
+			repo.Git.Push("origin HEAD");
+
+			return repo;
+		}
+
+		public RepositoryIndex GetIndex() =>
+			YamlFile<RepositoryIndex>.Read(GetIndexFilePath());
+
+		public YamlFile<RepositoryIndex> OpenIndex() =>
+			YamlFile<RepositoryIndex>.Open(GetIndexFilePath());
+
+		private static string GetBasePath(string repositoryName) =>
+			Path.Combine(Settings.AppDirectory, Constants.AppDirectoryBlentFolder, RepositoriesFolderName, repositoryName);
 
 		private string GetIndexFilePath() =>
 			Path.Combine(GetBasePath(), IndexFileName);
 
-		public string GetBasePath() =>
-			Path.Combine(Settings.AppDirectory, Constants.AppDirectoryBlentFolder, RepositoriesFolderName, _repositoryName);
+		private string GetBasePath() =>
+			GetBasePath(_repositoryName);
 	}
 }

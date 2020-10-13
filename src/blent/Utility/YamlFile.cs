@@ -11,7 +11,7 @@ namespace Blent.Utility
 
 		private YamlFile(string path)
 		{
-			_stream = File.Open(path, FileMode.Open);
+			_stream = File.Open(path, FileMode.OpenOrCreate);
 			_reader = new StreamReader(_stream);
 			_writer = new StreamWriter(_stream);
 		}

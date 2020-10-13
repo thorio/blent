@@ -14,27 +14,28 @@ namespace Blent.Verb.CreateProject
 
 		public override void Execute(CreateProjectOptions options)
 		{
-			var id = options.Id ?? $"default/{options.Name}";
+			//// TODO check if project already exists locally or in index
 
-			var repo = new Repository();
-			using var index = repo.OpenIndex();
-			var projectPath = Path.Combine(Settings.AppDirectory, options.Name);
+			//var id = options.Id ?? $"default/{options.Name}";
 
-			Output.Out.WriteLine("Creating worktree ...", Color.Info);
-			Git.AddWorktree(repo.GetBasePath(), projectPath, Constants.RepositoryIndexBranchName, true);
+			//var repo = RepositoryProvider.GetDefaultRepository();
+			//using var index = repo.OpenIndex();
+			//var projectPath = Path.Combine(Settings.AppDirectory, options.Name);
 
-			// TODO check if folder already exists locally, as creating the orphan branch deletes all files in the folder.
-			Output.Out.WriteLine("Creating branch ...", Color.Info);
-			Git.CreateOrphanBranch(projectPath, id);
+			//Output.Out.WriteLine("Creating worktree ...", Color.Info);
+			//Git.AddWorktree(repo.GetBasePath(), projectPath, Constants.RepositoryIndexBranchName, true);
 
-			Output.Out.WriteLine("Adding default files ...", Color.Info);
-			File.WriteAllText(Path.Combine(projectPath, "docker-compose.yml"), Resources.default_compose_yml.ToString().NormalizeLineEndings());
+			//Output.Out.WriteLine("Creating branch ...", Color.Info);
+			//Git.CreateOrphanBranch(projectPath, id);
 
-			// TODO update index
+			//Output.Out.WriteLine("Adding files ...", Color.Info);
+			//File.WriteAllText(Path.Combine(projectPath, "docker-compose.yml"), Resources.default_compose_yml.ToString().NormalizeLineEndings());
 
-			Output.Out.WriteLine("Pushing ...", Color.Info);
-			Git.AddCommitPush(projectPath, "CREATE PROJECT", $"origin {id}");
-			// TODO push index
+			//// TODO update index
+
+			//Output.Out.WriteLine("Pushing ...", Color.Info);
+			//Git.AddCommitPush(projectPath, "CREATE PROJECT", $"origin {id}");
+			//// TODO push index
 		}
 	}
 }

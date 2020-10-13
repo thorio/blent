@@ -1,6 +1,6 @@
 namespace Blent.ProjectRepository.Models
 {
-	public class ProjectIndexEntry
+	public class RepositoryIndexProject
 	{
 		public string Name { get; set; }
 		public string Branch { get; set; }

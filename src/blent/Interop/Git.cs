@@ -1,52 +1,61 @@
 using Blent.Utility;
-using System;
 
 namespace Blent.Interop
 {
-	public static class Git
+	public class Git
 	{
 		public const string Command = "git";
 
-		public static ProcessResults Run(string arguments, string workingDirectory = null, bool printOutput = false, bool printErrors = true) =>
-			Process.Run(Command, arguments, workingDirectory, printOutput, printErrors);
+		public readonly string _gitDir;
 
-		public static ProcessResults AddWorktree(string repoPath, string path, string branch, bool force = false)
+		public Git(string gitDir)
+		{
+			_gitDir = gitDir;
+		}
+
+		public ProcessResults Run(string arguments, bool printOutput = false, bool printErrors = true) =>
+			Process.Run(Command, arguments, _gitDir, printOutput, printErrors);
+
+		public ProcessResults AddWorktree(string path, string branch, bool force = false)
 		{
 			var arguments = $"worktree add {path} --checkout {branch} ";
 			if (force) arguments += "-f ";
-			return Run(arguments, repoPath);
+			return Run(arguments);
 		}
 
-		public static ProcessResults Checkout(string repoPath, string branch, bool isOrphan = false, bool quiet = false)
-		{
-			var arguments = "checkout ";
-			if (quiet) arguments += "-q ";
-			if (isOrphan) arguments += "--orphan ";
-			return Run(arguments + branch, repoPath);
-		}
+		public ProcessResults CreateBranch(string branch) =>
+			Run($"checkout -b {branch} -q");
 
-		public static ProcessResults Reset(string repoPath, string target, bool hard = false)
+		public ProcessResults Reset(string target, bool hard = false)
 		{
 			var arguments = $"reset {target} ";
 			if (hard) arguments += "--hard ";
-			return Run(arguments, repoPath);
+			return Run(arguments);
 		}
 
-		public static void AddCommitPush(string repoPath, string message, string setUpstream = null, bool quiet = false)
-		{
-			Run("add .", repoPath);
-			Run($"commit -m \"{message.EscapeDoubleQuotes()}\"", repoPath);
+		public void Init() =>
+			Run("init");
 
-			var arguments = "push ";
+		public ProcessResults AddRemote(string url, string name = "origin") =>
+			Run($"remote add {name} {url}");
+
+		public void CommitAll(string message)
+		{
+			Run("add .");
+			Run($"commit -m \"{message.EscapeDoubleQuotes()}\"");
+		}
+
+		public ProcessResults Push(string setUpstream = null)
+		{
+			var arguments = "push -q ";
 			if (!string.IsNullOrWhiteSpace(setUpstream)) arguments += $"-u {setUpstream} ";
-			if (quiet) arguments += "-q ";
-			Run(arguments, repoPath);
+			return Run(arguments);
 		}
 
-		public static void CreateOrphanBranch(string repoPath, string branch)
+		public void CreateOrphanBranch(string branch)
 		{
-			Checkout(repoPath, branch, true, true);
-			Reset(repoPath, "", true);
+			Run($"checkout --orphan {branch} -q");
+			Reset("", true);
 		}
 	}
 }

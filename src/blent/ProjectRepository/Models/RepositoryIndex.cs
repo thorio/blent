@@ -4,8 +4,7 @@ namespace Blent.ProjectRepository.Models
 {
 	public class RepositoryIndex
 	{
-		public string Version { get; set; }
-		public string Name { get; set; }
-		public IEnumerable<ProjectIndexEntry> Projects { get; set; }
+		public string IndexVersion { get; set; }
+		public IEnumerable<RepositoryIndexProject> Projects { get; set; }
 	}
 }
