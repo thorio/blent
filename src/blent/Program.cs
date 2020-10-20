@@ -11,9 +11,8 @@ namespace Blent
 		{
 			try
 			{
-				PerformanceTesting.Begin();
-				var errors = new CommandLineParser(args).ParseAndExecuteVerb();
-				return errors.Any() ? 1 : 0;
+				PreRun();
+				return Run(args);
 			}
 			catch (Exception ex)
 			{
@@ -25,6 +24,20 @@ namespace Blent
 			{
 				PerformanceTesting.Checkpoint("End");
 			}
+		}
+
+		private static void PreRun()
+		{
+			if (Environment.GetEnvironmentVariable("BLENT_PERF_TEST") == "true")
+			{
+				PerformanceTesting.Begin();
+			}
+		}
+
+		private static int Run(string[] args)
+		{
+			var errors = new CommandLineParser(args).ParseAndExecuteVerb();
+			return errors.Any() ? 1 : 0;
 		}
 	}
 }

@@ -11,16 +11,11 @@
 		<TargetName>blent</TargetName>
 		<TargetFramework>netcoreapp3.1</TargetFramework>
 		<RuntimeIdentifiers>win-x64;linux-x64;linux-arm;linux-arm64</RuntimeIdentifiers>
-		<Configurations>Debug;Release;Verbose</Configurations>
+		<Configurations>Debug;Release</Configurations>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
 		<PublishSingleFile>true</PublishSingleFile>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Verbose|AnyCPU'">
-	  <DefineConstants>CHECKPERF</DefineConstants>
-	  <Optimize>false</Optimize>
 	</PropertyGroup>
 
 	<ItemGroup>

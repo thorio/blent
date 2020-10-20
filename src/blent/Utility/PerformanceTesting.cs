@@ -1,31 +1,29 @@
-#if CHECKPERF
+using System;
 using System.Diagnostics;
-#endif
 
 namespace Blent.Utility
 {
 	public static class PerformanceTesting
 	{
-#if CHECKPERF
 		private static Stopwatch _stopwatch;
 		private static long _previous;
-#endif
+		private static bool _enable;
+		
 		public static void Begin()
 		{
-#if CHECKPERF
 			_stopwatch = Stopwatch.StartNew();
 			_previous = 0;
+			_enable = true;
 			Checkpoint("Begin");
-#endif
 		}
 
 		public static void Checkpoint(string message)
 		{
-#if CHECKPERF
+			if (!_enable) return;
+
 			var elapsed = _stopwatch.ElapsedMilliseconds;
 			Console.Error.WriteLine($"PERF | {elapsed,5}ms | +{elapsed - _previous,-5} | {message}");
 			_previous = elapsed;
-#endif
 		}
 	}
 }
