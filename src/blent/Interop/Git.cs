@@ -1,4 +1,6 @@
 using Blent.Utility;
+using System;
+using System.IO;
 
 namespace Blent.Interop
 {
@@ -13,15 +15,22 @@ namespace Blent.Interop
 			_gitDir = gitDir;
 		}
 
-		public ProcessResults Run(string arguments, bool printOutput = false, bool printErrors = true) =>
-			Process.Run(Command, arguments, _gitDir, printOutput, printErrors);
+		public ProcessResults Run(string arguments, bool printOutput = false, bool printErrors = true)
+		{
+			Output.Error.WriteLine("git " + arguments, Color.Warning);
+			return Process.Run(Command, arguments, _gitDir, printOutput, printErrors);
+		}
 
-		public ProcessResults AddWorktree(string path, string branch, bool force = false)
+		public Git AddWorktree(string path, string branch, bool force = false)
 		{
 			var arguments = $"worktree add {path} --checkout {branch} ";
 			if (force) arguments += "-f ";
-			return Run(arguments);
+			var results = Run(arguments);
+			return results.ExitCode == 0 ? new Git(path) : null;
 		}
+
+		public ProcessResults RemoveWorktree(string path) =>
+			Run($"worktree remove {path}");
 
 		public ProcessResults CreateBranch(string branch) =>
 			Run($"checkout -b {branch} -q");
@@ -39,10 +48,13 @@ namespace Blent.Interop
 		public ProcessResults AddRemote(string url, string name = "origin") =>
 			Run($"remote add {name} {url}");
 
-		public void CommitAll(string message)
+		public void CommitAll(string message, bool allowEmpty = false)
 		{
 			Run("add .");
-			Run($"commit -m \"{message.EscapeDoubleQuotes()}\"");
+
+			var arguments = $"commit -m \"{message.EscapeDoubleQuotes()}\" ";
+			if (allowEmpty) arguments += "--allow-empty ";
+			Run(arguments);
 		}
 
 		public ProcessResults Push(string setUpstream = null)
@@ -54,8 +66,13 @@ namespace Blent.Interop
 
 		public void CreateOrphanBranch(string branch)
 		{
-			Run($"checkout --orphan {branch} -q");
-			Reset("", true);
+			var tmpdir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
+
+			var worktree = AddWorktree(tmpdir, "HEAD", true);
+			worktree.Run($"checkout --orphan {branch} -q");
+			worktree.Reset("", true);
+			worktree.CommitAll("CREATE BRANCH", true);
+			RemoveWorktree(tmpdir);
 		}
 	}
 }

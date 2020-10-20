@@ -25,6 +25,12 @@ namespace Blent.ProjectRepository
 		public static Repository Create(string repositoryName, string remoteUrl)
 		{
 			var repo = new Repository(repositoryName);
+
+			if (Directory.Exists(Path.Combine(repo.GetBasePath(), ".git")))
+			{
+				ErrorHandling.LogFatalAndQuit("Repository already exists.");
+			}
+
 			Directory.CreateDirectory(repo.GetBasePath());
 			repo.Git.Init();
 			repo.Git.AddRemote(remoteUrl);
@@ -39,6 +45,15 @@ namespace Blent.ProjectRepository
 			repo.Git.Push("origin HEAD");
 
 			return repo;
+		}
+
+		public Project AddProject(string name, string id = null)
+		{
+			id ??= $"default/{name}";
+			var project = new Project(this, name, id);
+			Git.CreateOrphanBranch(id);
+			Git.AddWorktree(project.GetPath(), id);
+			return project;
 		}
 
 		public RepositoryIndex GetIndex() =>
