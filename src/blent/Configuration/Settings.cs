@@ -1,3 +1,4 @@
+using Blent.Configuration.Models;
 using Blent.Utility;
 using Microsoft.Extensions.Configuration;
 using System.IO;
@@ -9,38 +10,44 @@ namespace Blent.Configuration
 		private static string _appDirectory;
 		private static UserConfig _userConfig;
 
-		public static string AppDirectory
+		public static string GetAppDirectory()
 		{
-			get => _appDirectory ??= GetAppDirectory();
-			set => _appDirectory = CheckAppDirectory(value);
+			if (_appDirectory == null)
+			{
+				var appDirectory = GetUserConfig().AppDirectory.Replace("~", Environment.UserHomeDirectory);
+				_appDirectory = CheckAppDirectory(Path.GetFullPath(appDirectory));
+			}
+			return _appDirectory;
 		}
 
-		public static UserConfig UserConfig => _userConfig ??= GetUserConfig();
-
-		private static UserConfig GetUserConfig()
+		public static void SetAppDirectory(string value)
 		{
-			PerformanceTesting.Checkpoint("Begin Configuration");
-			var defaultConfigFileProvider = new StringFilerProvider(Properties.Resources.default_user_yml);
-			var config = new ConfigurationBuilder()
-				.AddYamlFile(defaultConfigFileProvider, "default.user.yml", false, false)
-				.AddYamlFile($"{Environment.UserHomeDirectory}/.config/blent/user.yml", true, false)
-				.Build()
-				.Get<UserConfig>();
-			PerformanceTesting.Checkpoint("End Configuration");
-			return config;
+			_appDirectory = CheckAppDirectory(value);
 		}
 
-		private static string GetAppDirectory()
+		public static UserConfig GetUserConfig()
 		{
-			var appDirectory = UserConfig.AppDirectory.Replace("~", Environment.UserHomeDirectory);
-			return CheckAppDirectory(Path.GetFullPath(appDirectory));
+			if (_userConfig == null)
+			{
+				PerformanceTesting.Checkpoint("Begin Configuration");
+				var defaultConfigFileProvider = new StringFilerProvider(Properties.Resources.default_user_yml);
+				_userConfig = new ConfigurationBuilder()
+					.AddYamlFile(defaultConfigFileProvider, "default.user.yml", false, false)
+					.AddYamlFile($"{Environment.UserHomeDirectory}/.config/blent/user.yml", true, false)
+					.Build()
+					.Get<UserConfig>();
+				PerformanceTesting.Checkpoint("End Configuration");
+			}
+			return _userConfig;
 		}
 
 		private static string CheckAppDirectory(string path)
 		{
-			return Directory.Exists(path)
-				? path
-				: ErrorHandling.LogFatalAndQuit<string>($"AppDirectory [{path}] does not exist.");
+			if (!Directory.Exists(path))
+			{
+				ErrorHandling.LogFatalAndQuit<string>($"AppDirectory [{path}] does not exist.");
+			};
+			return path;
 		}
 	}
 }

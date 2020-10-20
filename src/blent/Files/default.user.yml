@@ -1,1 +1,4 @@
 appDirectory: ~/app
+
+checks:
+  docker: true

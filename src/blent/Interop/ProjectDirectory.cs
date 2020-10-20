@@ -9,7 +9,7 @@ namespace Blent.Interop
 	{
 		public static IEnumerable<string> GetProjects()
 		{
-			return Directory.GetDirectories(Settings.AppDirectory)
+			return Directory.GetDirectories(Settings.GetAppDirectory())
 				.Select(d => Path.GetFileName(d))
 				.Where(p => p.First() != '.');
 		}

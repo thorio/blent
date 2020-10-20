@@ -1,3 +1,4 @@
+using Blent.Configuration;
 using Blent.Interop;
 using Blent.Utility;
 using Blent.Verb;
@@ -18,14 +19,14 @@ namespace Blent.Startup
 		{
 			if (options.AppDirectory != null)
 			{
-				Configuration.Settings.AppDirectory = options.AppDirectory;
+				Settings.SetAppDirectory(options.AppDirectory);
 			}
 		}
 
 		public static void PerformChecks(IVerb verb)
 		{
 			PerformanceTesting.Checkpoint("Begin Checks");
-			if (verb.RequiresDocker && !Docker.IsRunning())
+			if (verb.RequiresDocker && Settings.GetUserConfig().Checks.Docker && !Docker.IsRunning())
 			{
 				ErrorHandling.LogFatalAndQuit("Docker daemon is unreachable or not running.");
 			}

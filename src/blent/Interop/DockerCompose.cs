@@ -19,7 +19,7 @@ namespace Blent.Interop
 				return null;
 			}
 
-			return RunIn($"{Settings.AppDirectory}/{project}", arguments, printOutput);
+			return RunIn($"{Settings.GetAppDirectory()}/{project}", arguments, printOutput);
 		}
 
 		public static void Run(IEnumerable<string> projects, string arguments, bool printOutput)

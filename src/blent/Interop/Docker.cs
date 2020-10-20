@@ -18,7 +18,8 @@ namespace Blent.Interop
 		{
 			try
 			{
-				return Run("version", false, false).ExitCode == 0;
+				var result = Run("version", false, false);
+				return result.ExitCode == 0 && !result.Output.Contains("error during connect");
 			}
 			catch (Win32Exception)
 			{

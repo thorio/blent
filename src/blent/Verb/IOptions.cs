@@ -8,7 +8,7 @@ namespace Blent.Verb
 		string PassthroughArguments { get; set; }
 
 		/// <summary>
-		/// See <see cref="Configuration.Settings.AppDirectory"/>.
+		/// See <see cref="Configuration.Settings.GetAppDirectory()"/>.
 		/// </summary>
 		string AppDirectory { get; set; }
 	}
