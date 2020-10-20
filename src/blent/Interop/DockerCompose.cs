@@ -1,9 +1,6 @@
 using Blent.Configuration;
 using Blent.Utility;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
 
 namespace Blent.Interop
 {
@@ -11,31 +8,8 @@ namespace Blent.Interop
 	{
 		private const string Command = "docker-compose";
 
-		public static ProcessResults RunIn(string workingDirectory, string arguments, bool printOutput)
-		{
-			try
-			{
-				PerformanceTesting.Checkpoint($"Begin Process [docker-compose {arguments.Split(' ').First()}]");
-				var process = Process.Start(new ProcessStartInfo()
-				{
-					FileName = Command,
-					WorkingDirectory = workingDirectory ?? System.Environment.CurrentDirectory,
-					Arguments = arguments,
-					RedirectStandardOutput = !printOutput,
-					RedirectStandardError = !printOutput,
-				});
-				process.WaitForExit();
-
-				var output = printOutput ? null : process.StandardOutput.ReadToEnd();
-				PerformanceTesting.Checkpoint($"End Process docker-compose");
-				return new ProcessResults(process.ExitCode, output);
-			}
-			catch (Win32Exception)
-			{
-				ErrorHandling.LogFatalAndQuit("Docker-compose is not installed.");
-				throw;
-			}
-		}
+		public static ProcessResults RunIn(string workingDirectory, string arguments, bool printOutput) =>
+			Process.Run(Command, arguments, workingDirectory, printOutput, true);
 
 		public static ProcessResults Run(string project, string arguments, bool printOutput)
 		{
@@ -79,10 +53,8 @@ namespace Blent.Interop
 			Run(project, arguments, true);
 		}
 
-		public static void Pull(IEnumerable<string> projects)
-		{
+		public static void Pull(IEnumerable<string> projects) =>
 			Run(projects, "pull", true);
-		}
 
 		public static void Exec(string project, string service, string command, int serviceIndex = 1, string extraArguments = "")
 		{
