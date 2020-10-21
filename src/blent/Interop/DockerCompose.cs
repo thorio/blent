@@ -58,7 +58,7 @@ namespace Blent.Interop
 
 		public static void Exec(string project, string service, string command, int serviceIndex = 1, string extraArguments = "")
 		{
-			var arguments = $"exec --index={serviceIndex} {extraArguments} -- {service} {command}";
+			var arguments = $"exec --index={serviceIndex} {extraArguments} {service} {command}";
 			Run(project, arguments, true);
 		}
 	}
