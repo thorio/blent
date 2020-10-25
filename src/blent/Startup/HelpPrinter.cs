@@ -58,6 +58,8 @@ namespace Blent.Startup
 			var builder = new HelpText("", "")
 			{
 				AutoVersion = false,
+				AddEnumValuesToHelpText = true,
+				MaximumDisplayWidth = 80,
 			};
 			configure(builder);
 

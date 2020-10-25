@@ -44,6 +44,7 @@ namespace Blent.Startup
 			{
 				p.HelpWriter = null;
 				p.AutoVersion = false;
+				p.CaseInsensitiveEnumValues = true;
 			});
 		}
 

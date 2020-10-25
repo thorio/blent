@@ -16,5 +16,10 @@ namespace Blent.Interop
 
 		public static bool ProjectExists(string project) =>
 			GetProjects().Contains(project);
+
+		public static string GetProjectDirectory(string projectName)
+		{
+			return Path.Combine(Settings.GetAppDirectory(), projectName);
+		}
 	}
 }

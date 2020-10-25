@@ -33,7 +33,7 @@ namespace Blent.Configuration
 				var defaultConfigFileProvider = new StringFilerProvider(Properties.Resources.default_user_yml);
 				_userConfig = new ConfigurationBuilder()
 					.AddYamlFile(defaultConfigFileProvider, "default.user.yml", false, false)
-					.AddYamlFile($"{Environment.UserHomeDirectory}/.config/blent/user.yml", true, false)
+					.AddYamlFile(Path.Combine(Environment.UserHomeDirectory, ".config", "blent", "user.yml"), true, false)
 					.Build()
 					.Get<UserConfig>();
 				PerformanceTesting.Checkpoint("End Configuration");

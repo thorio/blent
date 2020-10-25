@@ -1,4 +1,3 @@
-using Blent.Configuration;
 using Blent.Utility;
 using System.Collections.Generic;
 
@@ -19,7 +18,7 @@ namespace Blent.Interop
 				return null;
 			}
 
-			return RunIn($"{Settings.GetAppDirectory()}/{project}", arguments, printOutput);
+			return RunIn(ProjectDirectory.GetProjectDirectory(project), arguments, printOutput);
 		}
 
 		public static void Run(IEnumerable<string> projects, string arguments, bool printOutput)
