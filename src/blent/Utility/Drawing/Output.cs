@@ -5,16 +5,16 @@ namespace Blent.Utility.Drawing
 {
 	public class Output
 	{
+		public static Output Out { get; }
+		public static Output Error { get; }
+
+		private readonly TextWriter _textWriter;
+
 		static Output()
 		{
 			Out = new Output(Console.Out);
 			Error = new Output(Console.Error);
 		}
-
-		public static Output Out { get; }
-		public static Output Error { get; }
-
-		private readonly TextWriter _textWriter;
 
 		public Output(TextWriter textWriter)
 		{
