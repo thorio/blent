@@ -1,4 +1,4 @@
-namespace Blent.Utility
+namespace Blent.Utility.Drawing
 {
 	public enum Color
 	{

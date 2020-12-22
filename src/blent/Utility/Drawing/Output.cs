@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace Blent.Utility
+namespace Blent.Utility.Drawing
 {
 	public class Output
 	{

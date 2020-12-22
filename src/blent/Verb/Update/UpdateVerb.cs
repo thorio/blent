@@ -1,5 +1,5 @@
 using Blent.Interop;
-using Blent.Utility;
+using Blent.Utility.Drawing;
 using System.Linq;
 
 namespace Blent.Verb.Update
