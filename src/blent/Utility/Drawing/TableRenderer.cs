@@ -2,55 +2,75 @@ using Blent.Utility.Drawing.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Blent.Utility.Drawing
 {
 	public class TableRenderer
 	{
 		private const int ColumnDividerWidth = 2;
-		private Table _table;
-		private Output _output;
+		private readonly Table _table;
+		private bool _finished;
 
-		public TableRenderer(Table table, Output output)
+		public TableRenderer(Table table)
 		{
 			_table = table;
-			_output = output;
+			_table.CellChanged += OnCellChanged;
+			DrawTable();
 		}
 
-		public void Draw()
+		private void OnCellChanged(object sender, CellChangedEventArgs e)
 		{
-			Console.Beep();
-			_table.RecomputeLayout();
-			DrawHeader();
-			foreach (var row in _table.Rows)
+			if (!_finished)
 			{
-				DrawRow(row);
+				Console.Write(DrawCellAt(e.Cell, e.Row, e.Column));
 			}
 		}
 
-		private void DrawHeader()
+		public void StopUpdating()
 		{
-			var values = _table.Columns
-				.Select(k => new KeyValuePair<int, string>(k.Key, k.Value.Name));
-			DrawRow(values);
-
-			var rowLength = _table.Columns.Values.Sum(c => c.Width + ColumnDividerWidth);
-			_output.WriteLine(new string('-', rowLength));
+			Console.Write("\n");
+			_finished = true;
 		}
 
-		private void DrawRow(TableRow row)
+		public void DrawTable()
 		{
-			DrawRow(row.Values);
+			var builder = new StringBuilder();
+			var tableWidth = _table.GetColumnWidths().Sum(w => w + ColumnDividerWidth);
+
+			builder.AppendLine(DrawRow(_table.GetHeaderRow()));
+			builder.AppendLine(new string('-', tableWidth));
+
+			var rows = _table.GetData().Select(r => DrawRow(r));
+			builder.AppendJoin('\n', rows);
+			builder.Append("\r");
+
+			Console.Write(builder.ToString());
 		}
 
-		private void DrawRow(IEnumerable<KeyValuePair<int, string>> values)
+		private string DrawRow(IEnumerable<IReadOnlyTableCell> cells)
 		{
-			var cells = values.Select((keyValuePair, i) =>
-				{
-					var column = _table.Columns[i];
-					return keyValuePair.Value.PadRight(column.Width + ColumnDividerWidth);
-				});
-			_output.WriteLine(string.Concat(cells));
+			var columnWidths = _table.GetColumnWidths();
+			var cellValues = cells.Select((cell, i) => DrawCell(cell, columnWidths[i]));
+
+			return string.Concat(cellValues);
 		}
+
+		private string DrawCellAt(IReadOnlyTableCell cell, int row, int column)
+		{
+			var columnWidths = _table.GetColumnWidths();
+			var shiftY = _table.RowCount - (row + 1);
+			var shiftX = columnWidths.Take(column).Sum(w => w + ColumnDividerWidth);
+			return DrawAt(DrawCell(cell, columnWidths[column]), shiftX, shiftY);
+		}
+
+		private string DrawCell(IReadOnlyTableCell cell, int columnWidth) =>
+			cell.Text.PadRight(columnWidth + ColumnDividerWidth);
+
+		/// <summary>
+		/// Moves the cursor to a relative position and prints the string, then moves the cursor back.
+		/// </summary>
+		private string DrawAt(string str, int relativeX, int relativeY) =>
+			$"\u001b[{relativeY}A\u001b[{relativeX}C{str}\u001b[{relativeY}B\r";
 	}
 }
