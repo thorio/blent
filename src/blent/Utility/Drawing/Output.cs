@@ -19,13 +19,14 @@ namespace Blent.Utility.Drawing
 		public Output(TextWriter textWriter)
 		{
 			_textWriter = textWriter;
+			Colors = new ColorHelper();
 		}
+
+		public ColorHelper Colors { get; set; }
 
 		public void Write(string text, Color color = Color.Default)
 		{
-			var previousColor = SetColor(color);
-			_textWriter.Write(text.NormalizeLineEndings());
-			Console.ForegroundColor = previousColor;
+			_textWriter.Write(Colors.Get(color) + text.NormalizeLineEndings());
 		}
 
 		public void WriteLine()
@@ -33,31 +34,9 @@ namespace Blent.Utility.Drawing
 			_textWriter.WriteLine();
 		}
 
-
 		public void WriteLine(string text, Color color = Color.Default)
 		{
-			var previousColor = SetColor(color);
-			_textWriter.WriteLine(text.NormalizeLineEndings());
-			Console.ForegroundColor = previousColor;
-		}
-
-		private ConsoleColor SetColor(Color color)
-		{
-			var originalColor = Console.ForegroundColor;
-			ConsoleColor? newColor = color switch
-			{
-				Color.Default => null,
-				Color.Muted => ConsoleColor.DarkGray,
-				Color.Primary => ConsoleColor.Gray,
-				Color.Success => ConsoleColor.DarkGreen,
-				Color.Info => ConsoleColor.DarkCyan,
-				Color.Warning => ConsoleColor.Yellow,
-				Color.Danger => ConsoleColor.Red,
-				_ => null,
-			};
-
-			Console.ForegroundColor = newColor ?? originalColor;
-			return originalColor;
+			_textWriter.WriteLine(Colors.Get(color) + text.NormalizeLineEndings());
 		}
 	}
 }

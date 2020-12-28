@@ -1,5 +1,3 @@
-using Blent.Utility.Drawing.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,13 +6,15 @@ namespace Blent.Utility.Drawing
 {
 	public class TableRenderer
 	{
-		private const int ColumnDividerWidth = 2;
+		private const int ColumnDividerWidth = 3;
 		private readonly Table _table;
+		private readonly Output _output;
 		private bool _finished;
 
-		public TableRenderer(Table table)
+		public TableRenderer(Table table, Output output)
 		{
 			_table = table;
+			_output = output;
 			_table.CellChanged += OnCellChanged;
 			DrawTable();
 		}
@@ -23,13 +23,13 @@ namespace Blent.Utility.Drawing
 		{
 			if (!_finished)
 			{
-				Console.Write(DrawCellAt(e.Cell, e.Row, e.Column));
+				_output.Write(DrawCellAt(e.Cell, e.Row, e.Column));
 			}
 		}
 
 		public void StopUpdating()
 		{
-			Console.Write("\n");
+			_output.WriteLine();
 			_finished = true;
 		}
 
@@ -45,7 +45,7 @@ namespace Blent.Utility.Drawing
 			builder.AppendJoin('\n', rows);
 			builder.Append("\r");
 
-			Console.Write(builder.ToString());
+			_output.Write(builder.ToString());
 		}
 
 		private string DrawRow(IEnumerable<IReadOnlyTableCell> cells)
@@ -59,18 +59,26 @@ namespace Blent.Utility.Drawing
 		private string DrawCellAt(IReadOnlyTableCell cell, int row, int column)
 		{
 			var columnWidths = _table.GetColumnWidths();
-			var shiftY = _table.RowCount - (row + 1);
-			var shiftX = columnWidths.Take(column).Sum(w => w + ColumnDividerWidth);
-			return DrawAt(DrawCell(cell, columnWidths[column]), shiftX, shiftY);
+			var relativeY = _table.RowCount - (row + 1);
+			var absoluteX = columnWidths.Take(column).Sum(w => w + ColumnDividerWidth);
+			return DrawAt(DrawCell(cell, columnWidths[column]), absoluteX, relativeY);
 		}
 
-		private string DrawCell(IReadOnlyTableCell cell, int columnWidth) =>
-			cell.Text.PadRight(columnWidth + ColumnDividerWidth);
+		private string DrawCell(IReadOnlyTableCell cell, int columnWidth)
+		{
+			var content = cell.Text;
+			if (content.Length > columnWidth)
+			{
+				content = content.Substring(0, columnWidth);
+			}
+
+			return _output.Colors.Get(cell.Color) + content.PadRight(columnWidth + ColumnDividerWidth);
+		}
 
 		/// <summary>
 		/// Moves the cursor to a relative position and prints the string, then moves the cursor back.
 		/// </summary>
-		private string DrawAt(string str, int relativeX, int relativeY) =>
-			$"\u001b[{relativeY}A\u001b[{relativeX}C{str}\u001b[{relativeY}B\r";
+		private string DrawAt(string str, int absoluteX, int relativeY) =>
+			$"\u001b[{relativeY}A\u001b[{absoluteX}C{str}\u001b[{relativeY}B\r";
 	}
 }

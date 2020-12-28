@@ -1,4 +1,4 @@
-namespace Blent.Utility.Drawing.Models
+namespace Blent.Utility.Drawing
 {
 	public class TableCell : IReadOnlyTableCell
 	{

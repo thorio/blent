@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Blent.Utility.Drawing.Models
+namespace Blent.Utility.Drawing
 {
 	public class Table
 	{
@@ -13,11 +13,11 @@ namespace Blent.Utility.Drawing.Models
 		#endregion
 
 		#region Constructors
-		public Table(IEnumerable<string> columnNames, IEnumerable<IEnumerable<string>> data)
+		public Table(IEnumerable<string> columnNames, IEnumerable<IEnumerable<string>> data, IEnumerable<int> columnWidths = null)
 		{
 			_rows = data.Select(StringsToCellList).ToList();
 			_headerCells = StringsToCellList(columnNames);
-			_columnWidths = new List<int>(new int[_headerCells.Count]);
+			_columnWidths = columnWidths.ToList() ?? new List<int>(new int[_headerCells.Count]);
 
 			ComputeOptimalColumnWidths();
 		}
@@ -67,10 +67,15 @@ namespace Blent.Utility.Drawing.Models
 		private IReadOnlyList<IReadOnlyTableCell> GetReadOnlyRow(IList<TableCell> cells) =>
 			cells.Cast<IReadOnlyTableCell>().ToArray();
 
+		/// <summary>
+		/// Sets the column widths to fit the contents. <br />
+		/// Columns that already have a width (!= 0) are ignored.
+		/// </summary>
 		private void ComputeOptimalColumnWidths()
 		{
 			for (var i = 0; i < _headerCells.Count; i++)
 			{
+				if (_columnWidths[i] != 0) continue;
 				_columnWidths[i] = _rows.Select(r => r[i])
 					.Append(_headerCells[i])
 					.Max(c => c.Text.Length);
