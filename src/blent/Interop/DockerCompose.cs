@@ -52,8 +52,8 @@ namespace Blent.Interop
 			Run(project, arguments, true);
 		}
 
-		public static void Pull(IEnumerable<string> projects) =>
-			Run(projects, "pull", true);
+		public static ProcessResults Pull(string project) =>
+			Run(project, "pull", false);
 
 		public static void Exec(string project, string service, string command, int serviceIndex = 1, string extraArguments = "")
 		{
