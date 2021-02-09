@@ -8,7 +8,7 @@ namespace Blent.Interop
 		private const string Command = "docker-compose";
 
 		public static ProcessResults RunIn(string workingDirectory, string arguments, bool printOutput) =>
-			Process.Run(Command, arguments, workingDirectory, printOutput, true);
+			Process.Run(Command, arguments, workingDirectory, printOutput, printOutput);
 
 		public static ProcessResults Run(string project, string arguments, bool printOutput)
 		{
@@ -37,11 +37,11 @@ namespace Blent.Interop
 			Run(projects, arguments + extraArguments, true);
 		}
 
-		public static void Down(IEnumerable<string> projects, string extraArguments = "", bool removeOrphans = false)
+		public static ProcessResults Down(string project, string extraArguments = "", bool removeOrphans = false, bool printOutput = true)
 		{
 			var arguments = $"down ";
 			if (removeOrphans) arguments += "--remove-orphans ";
-			Run(projects, arguments + extraArguments, true);
+			return Run(project, arguments + extraArguments, printOutput);
 		}
 
 		public static void Logs(string project, IEnumerable<string> services, bool follow = false, bool showTimestamps = false)

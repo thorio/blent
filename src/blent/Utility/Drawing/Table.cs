@@ -17,9 +17,15 @@ namespace Blent.Utility.Drawing
 		{
 			_rows = data.Select(StringsToCellList).ToList();
 			_headerCells = StringsToCellList(columnNames);
-			_columnWidths = columnWidths.ToList() ?? new List<int>(new int[_headerCells.Count]);
+			_columnWidths = columnWidths?.ToList() ?? new List<int>(new int[_headerCells.Count]);
 
 			ComputeOptimalColumnWidths();
+			ShowHeader = true;
+		}
+
+		public Table(IEnumerable<IEnumerable<string>> data, IEnumerable<int> columnWidths = null) : this(data.First().Select(d => ""), data, columnWidths)
+		{
+			ShowHeader = false;
 		}
 		#endregion
 
@@ -29,6 +35,7 @@ namespace Blent.Utility.Drawing
 
 		#region Properties
 		public int RowCount => _rows.Count;
+		public bool ShowHeader { get; set; }
 		#endregion
 
 		#region Public

@@ -36,10 +36,13 @@ namespace Blent.Utility.Drawing
 		public void DrawTable()
 		{
 			var builder = new StringBuilder();
-			var tableWidth = _table.GetColumnWidths().Sum(w => w + ColumnDividerWidth);
 
-			builder.AppendLine(DrawRow(_table.GetHeaderRow()));
-			builder.AppendLine(new string('-', tableWidth));
+			if (_table.ShowHeader)
+			{
+				var tableWidth = _table.GetColumnWidths().Sum(w => w + ColumnDividerWidth);
+				builder.AppendLine(DrawRow(_table.GetHeaderRow()));
+				builder.AppendLine(new string('-', tableWidth));
+			}
 
 			var rows = _table.GetData().Select(r => DrawRow(r));
 			builder.AppendJoin('\n', rows);
@@ -78,7 +81,12 @@ namespace Blent.Utility.Drawing
 		/// <summary>
 		/// Moves the cursor to a relative position and prints the string, then moves the cursor back.
 		/// </summary>
-		private string DrawAt(string str, int absoluteX, int relativeY) =>
-			$"\u001b[{relativeY}A\u001b[{absoluteX}C{str}\u001b[{relativeY}B\r";
+		private string DrawAt(string str, int absoluteX, int relativeY)
+		{
+			var up = relativeY > 0 ? $"\u001b[{relativeY}A" : "";
+			var left = absoluteX > 0 ? $"\u001b[{absoluteX}C" : "";
+			var down = relativeY > 0 ? $"\u001b[{relativeY}B" : "";
+			return $"{up}{left}{str}{down}\r";
+		}
 	}
 }
