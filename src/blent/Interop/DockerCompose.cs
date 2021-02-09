@@ -29,12 +29,12 @@ namespace Blent.Interop
 			}
 		}
 
-		public static void Up(IEnumerable<string> projects, string extraArguments = "", bool detached = true, bool forceRecreate = false)
+		public static ProcessResults Up(string project, string extraArguments = "", bool detached = true, bool forceRecreate = false, bool printOutput = true)
 		{
 			var arguments = $"up ";
 			if (detached) arguments += "-d ";
 			if (forceRecreate) arguments += "--force-recreate ";
-			Run(projects, arguments + extraArguments, true);
+			return Run(project, arguments + extraArguments, printOutput);
 		}
 
 		public static ProcessResults Down(string project, string extraArguments = "", bool removeOrphans = false, bool printOutput = true)
