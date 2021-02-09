@@ -17,6 +17,11 @@ namespace Blent.Utility.Drawing
 			return _colorTable[color];
 		}
 
+		public string GetReset()
+		{
+			return Get(Color.Default);
+		}
+
 		private static Dictionary<Color, string> GetDefaultColorTable()
 		{
 			return new Dictionary<Color, string>()

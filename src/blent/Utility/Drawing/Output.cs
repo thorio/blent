@@ -38,5 +38,10 @@ namespace Blent.Utility.Drawing
 		{
 			_textWriter.WriteLine(Colors.Get(color) + text.NormalizeLineEndings());
 		}
+
+		public void ResetStyling()
+		{
+			_textWriter.Write(Colors.GetReset());
+		}
 	}
 }

@@ -1,4 +1,4 @@
-using System;
+using Blent.Utility.Drawing;
 using System.Diagnostics;
 
 namespace Blent.Utility
@@ -22,7 +22,7 @@ namespace Blent.Utility
 			if (!_enable) return;
 
 			var elapsed = _stopwatch.ElapsedMilliseconds;
-			Console.Error.WriteLine($"PERF | {elapsed,5}ms | +{elapsed - _previous,-5} | {message}");
+			Output.Error.WriteLine($"PERF | {elapsed,5}ms | +{elapsed - _previous,-5} | {message}");
 			_previous = elapsed;
 		}
 	}

@@ -1,5 +1,6 @@
 using Blent.Startup;
 using Blent.Utility;
+using Blent.Utility.Drawing;
 using System;
 using System.Linq;
 
@@ -22,6 +23,7 @@ namespace Blent
 			}
 			finally
 			{
+				Output.Error.ResetStyling();
 				PerformanceTesting.Checkpoint("End");
 			}
 		}
