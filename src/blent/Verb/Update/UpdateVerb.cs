@@ -2,8 +2,8 @@ using Blent.Interop;
 using Blent.Utility;
 using Blent.Utility.Drawing;
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Blent.Verb.Update
 {
@@ -11,8 +11,6 @@ namespace Blent.Verb.Update
 	{
 		public override bool RequiresDocker => true;
 		public override string Usage => "[PROJECT...] [options] [--] [docker-compose-up_options]";
-
-		private Table _table;
 
 		public override void Execute(UpdateOptions options)
 		{
@@ -23,16 +21,8 @@ namespace Blent.Verb.Update
 				return;
 			}
 
-			var progress = new Progress<(int, bool, bool?)>(HandleProgress);
-			_table = new Table(new[] { "Project", "Pull", "Restart" }, projects.Select(p => new[] { p, "...", "" }), new[] { 0, 5, 0 });
-			var tableRenderer = new TableRenderer(_table, Output.Out);
-
-			Parallel.ForEach(projects, (project, state, index) =>
-			{
-				Run((int)index, project, progress);
-			});
-
-			tableRenderer.StopUpdating();
+			new ParallelTaskManager<string, (TaskState, TaskState)>(projects, GetRow, (project, progress) => Execute(project, progress, options), HandleProgress, new[] { 0, 5, 0 }, new[] { "Project", "Pull", "Restart" })
+				.Execute();
 
 			if (options.RemoveDanglingImages)
 			{
@@ -40,9 +30,32 @@ namespace Blent.Verb.Update
 			}
 		}
 
+		private IEnumerable<string> GetRow(string project) =>
+			new[] { project, TaskState.Pending.ToCell().Text, "" };
+
+		public void Execute(string project, IProgress<(TaskState, TaskState)> progress, UpdateOptions options)
+		{
+			var pullResults = DockerCompose.Pull(project);
+			var pullSuccess = pullResults.ExitCode == 0;
+			progress.Report((pullSuccess.ToTaskState(), TaskState.Pending));
+
+			if (!pullSuccess) return;
+
+			var upResults = DockerCompose.Up(project, printOutput: false);
+			var upSuccess = upResults.ExitCode == 0;
+			progress.Report((TaskState.Success, upSuccess.ToTaskState()));
+		}
+
+		private void HandleProgress((TaskState pullState, TaskState upState) report, TableRow row)
+		{
+			row.SetCell(report.pullState.ToCell(), 1);
+			row.SetCell(report.upState.ToCell(), 2);
+		}
+
 		private void RemoveDanglingImages()
 		{
 			Output.Out.WriteLine("\nRemoving dangling images ...", Color.Info);
+
 			var images = Docker.GetImages("dangling=true");
 			if (images.Any())
 			{
@@ -52,34 +65,6 @@ namespace Blent.Verb.Update
 			else
 			{
 				Output.Out.WriteLine("No dangling images found.");
-			}
-		}
-
-		public void Run(int row, string project, IProgress<(int, bool, bool?)> progress)
-		{
-			DockerCompose.Pull(project);
-			progress.Report((row, true, null));
-
-			DockerCompose.Up(project, printOutput: false);
-			progress.Report((row, true, true));
-		}
-
-		private void HandleProgress((int row, bool pullSuccess, bool? upSuccess) progress)
-		{
-			SetCell(progress.pullSuccess, progress.row, 1);
-			SetCell(progress.upSuccess, progress.row, 2);
-		}
-
-		private void SetCell(bool? success, int row, int column)
-		{
-			if (success.HasValue)
-			{
-				var cell = success.Value ? new TableCell("done", Color.Success) : new TableCell("error", Color.Danger);
-				_table.SetCell(cell, row, column);
-			}
-			else
-			{
-				_table.SetCell("...", row, column);
 			}
 		}
 	}

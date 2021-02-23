@@ -13,19 +13,14 @@ namespace Blent.Utility.Drawing
 		#endregion
 
 		#region Constructors
-		public Table(IEnumerable<string> columnNames, IEnumerable<IEnumerable<string>> data, IEnumerable<int> columnWidths = null)
+		public Table(IEnumerable<IEnumerable<string>> data, IEnumerable<int> columnWidths = null, IEnumerable<string> columnNames = null)
 		{
 			_rows = data.Select(StringsToCellList).ToList();
-			_headerCells = StringsToCellList(columnNames);
+			_headerCells = StringsToCellList(columnNames ?? data.First().Select(d => ""));
 			_columnWidths = columnWidths?.ToList() ?? new List<int>(new int[_headerCells.Count]);
 
 			ComputeOptimalColumnWidths();
-			ShowHeader = true;
-		}
-
-		public Table(IEnumerable<IEnumerable<string>> data, IEnumerable<int> columnWidths = null) : this(data.First().Select(d => ""), data, columnWidths)
-		{
-			ShowHeader = false;
+			ShowHeader = columnNames != null;
 		}
 		#endregion
 
@@ -42,7 +37,10 @@ namespace Blent.Utility.Drawing
 		public IReadOnlyList<IReadOnlyList<IReadOnlyTableCell>> GetData() =>
 			_rows.Select(r => GetReadOnlyRow(r)).ToArray();
 
-		public IReadOnlyList<IReadOnlyTableCell> GetRow(int index) =>
+		public TableRow GetRow(int index) =>
+			new TableRow(this, index);
+
+		public IReadOnlyList<IReadOnlyTableCell> GetRowCells(int index) =>
 			GetReadOnlyRow(_rows[index]);
 
 		public IReadOnlyList<IReadOnlyTableCell> GetHeaderRow() =>
