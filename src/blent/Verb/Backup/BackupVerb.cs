@@ -8,7 +8,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Blent.Verb.Backup
 {
@@ -19,51 +18,51 @@ namespace Blent.Verb.Backup
 
 		public override void Execute(BackupOptions options)
 		{
-			var projects = GetProjects(options.Projects);
+			var projects = (options.Projects.Any() ? options.Projects : ProjectDirectory.GetProjects()).ToList();
+			if (!projects.Any())
+			{
+				ErrorHandling.LogError("There are no projects to back up.");
+				return;
+			}
 
 			Directory.CreateDirectory(options.BackupDirectory);
 
-			Output.Out.WriteLine("Writing backups ... ", Color.Info);
-			WriteBackups(projects, options.BackupDirectory, options.CompressionLevel);
+			new ParallelTaskManager<string, TaskState>(projects, GetRow, (project, progress) => Execute(project, progress, options), HandleProgress,
+				new[] { 0, 5 })
+				.Execute();
 
+			TrimBackups(projects, options.BackupDirectory, options.NumberOfBackups);
+		}
+
+		private IEnumerable<string> GetRow(string project) =>
+			new[] { project, TaskState.Pending.ToCell().Text };
+
+		public void Execute(string project, IProgress<TaskState> progress, BackupOptions options)
+		{
+			var projectDirectory = ProjectDirectory.GetProjectDirectory(project);
+			var archivePath = Path.Combine(options.BackupDirectory, $"{project}_{DateTime.Now.ToUnixTimestampMillis()}.zip");
+
+			try
+			{
+				ZipFile.CreateFromDirectory(projectDirectory, archivePath, options.CompressionLevel, false);
+				progress.Report(TaskState.Success);
+			}
+			catch
+			{
+				progress.Report(TaskState.Failure);
+				// TODO show exception message
+			}
+		}
+
+		private void HandleProgress(TaskState taskState, TableRow row)
+		{
+			row.SetCell(taskState.ToCell(), 1);
+		}
+
+		private void TrimBackups(IList<string> projects, string backupDirectory, int numberToKeep)
+		{
 			Output.Out.Write("\nDeleting old backups ... ", Color.Info);
-			var backupsTrimmed = TrimBackups(projects, options.BackupDirectory, options.NumberOfBackups);
-			Output.Out.WriteLine($"{backupsTrimmed} backups deleted.", Color.Success);
-		}
 
-		private IList<string> GetProjects(IEnumerable<string> projects)
-		{
-			var projectList = projects.ToList();
-			if (!projectList.Any())
-			{
-				projectList = ProjectDirectory.GetProjects().ToList();
-			}
-
-			if (!projectList.Any())
-			{
-				ErrorHandling.LogFatalAndQuit("There are no projects to back up.");
-			}
-
-			return projectList;
-		}
-
-		private void WriteBackups(IList<string> projects, string backupDirectory, CompressionLevel compressionLevel)
-		{
-			var maxLength = projects.Max(p => p.Length);
-			Parallel.ForEach(projects, (project) =>
-			{
-				var watch = new Stopwatch();
-				watch.Start();
-				var projectDirectory = ProjectDirectory.GetProjectDirectory(project);
-				var archivePath = Path.Combine(backupDirectory, $"{project}_{DateTime.Now.ToUnixTimestampMillis()}.zip");
-
-				ZipFile.CreateFromDirectory(projectDirectory, archivePath, compressionLevel, false);
-				Output.Out.WriteLine($"archived {project.PadRight(maxLength)} in {watch.Elapsed.TotalSeconds:0.##}s", Color.Default);
-			});
-		}
-
-		private int TrimBackups(IList<string> projects, string backupDirectory, int numberToKeep)
-		{
 			var projectsToDelete = Directory.GetFiles(backupDirectory)
 				.Select(p => new FileInfo(p))
 				.GroupBy(f => Regex.Match(f.Name, @"(.*)_").Groups[1].Value) // group by project
@@ -78,7 +77,7 @@ namespace Blent.Verb.Backup
 				project.Delete();
 			}
 
-			return projectsToDelete.Count;
+			Output.Out.WriteLine($"{projectsToDelete.Count} backups deleted.", Color.Success);
 		}
 	}
 }

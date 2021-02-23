@@ -21,7 +21,8 @@ namespace Blent.Verb.Update
 				return;
 			}
 
-			new ParallelTaskManager<string, (TaskState, TaskState)>(projects, GetRow, (project, progress) => Execute(project, progress, options), HandleProgress, new[] { 0, 5, 0 }, new[] { "Project", "Pull", "Restart" })
+			new ParallelTaskManager<string, (TaskState, TaskState)>(projects, GetRow, (project, progress) => Execute(project, progress, options), HandleProgress,
+				new[] { 0, 5, 0 }, new[] { "Project", "Pull", "Restart" })
 				.Execute();
 
 			if (options.RemoveDanglingImages)
