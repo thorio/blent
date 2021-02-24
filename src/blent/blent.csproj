@@ -9,13 +9,15 @@
 
 		<OutputType>Exe</OutputType>
 		<TargetName>blent</TargetName>
-		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<TargetFramework>net5.0</TargetFramework>
 		<RuntimeIdentifiers>win-x64;linux-x64;linux-arm;linux-arm64</RuntimeIdentifiers>
 		<Configurations>Debug;Release</Configurations>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
 		<PublishSingleFile>true</PublishSingleFile>
+		<SelfContained>true</SelfContained>
+		<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
 	</PropertyGroup>
 
 	<ItemGroup>
