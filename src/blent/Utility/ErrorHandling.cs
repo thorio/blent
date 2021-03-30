@@ -31,9 +31,21 @@ namespace Blent.Utility
 		public static void LogException(Exception ex)
 		{
 			Output.Error.Write("UNHANDLED EXCEPTION: ", Color.Danger);
-			Output.Error.WriteLine($"{ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}\n");
+			Output.Error.WriteLine(FormatException(ex));
+
+			if (ex is AggregateException aggregateException)
+			{
+				Output.Error.WriteLine("Inner Exceptions:");
+				foreach (var innerException in aggregateException.InnerExceptions)
+				{
+					Output.Error.WriteLine(FormatException(innerException));
+				}
+			}
 			Output.Error.WriteLine($"Please report this issue at {Constants.IssuesUrl}", Color.Warning);
 		}
+
+		private static string FormatException(Exception ex)
+			=> $"{ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}\n";
 
 		private static void Log(string message, string level, Color color)
 		{
