@@ -7,7 +7,7 @@ namespace Blent.Verb.Test
 
 		public override void Execute(TestOptions options)
 		{
-			new Down.DownVerb().Execute(new Down.DownOptions() { Projects = new string[0] });
+			new Down.DownVerb().Execute(new Down.DownOptions() { Projects = new[] { "doesntexist", "doesntexisteither" } });
 		}
 	}
 }

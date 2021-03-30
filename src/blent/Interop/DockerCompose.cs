@@ -15,7 +15,7 @@ namespace Blent.Interop
 			if (!ProjectDirectory.ProjectExists(project))
 			{
 				ErrorHandling.LogError($"Project '{project}' not found.");
-				return null;
+				return new ProcessResults(1);
 			}
 
 			return RunIn(ProjectDirectory.GetProjectDirectory(project), arguments, printOutput);
