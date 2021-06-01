@@ -1,3 +1,4 @@
+#if DEBUG
 using CommandLine;
 using System.Collections.Generic;
 
@@ -10,3 +11,4 @@ namespace Blent.Verb.Test
 		public IEnumerable<string> Values { get; set; }
 	}
 }
+#endif

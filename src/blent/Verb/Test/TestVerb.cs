@@ -1,3 +1,4 @@
+#if DEBUG
 namespace Blent.Verb.Test
 {
 	public class TestVerb : Verb<TestOptions>
@@ -11,3 +12,4 @@ namespace Blent.Verb.Test
 		}
 	}
 }
+#endif
