@@ -2,8 +2,8 @@ namespace Blent.Utility
 {
 	public enum TaskState
 	{
-		Pending,
-		Success,
-		Failure
+		Pending = 0,
+		Success = 1,
+		Failure = 2,
 	}
 }

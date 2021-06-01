@@ -1,4 +1,4 @@
-using Blent.Utility.Drawing;
+using Blent.Utility;
 using System.Reflection;
 
 namespace Blent.Verb.Version

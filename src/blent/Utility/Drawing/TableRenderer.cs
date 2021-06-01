@@ -8,10 +8,10 @@ namespace Blent.Utility.Drawing
 	{
 		private const int ColumnDividerWidth = 3;
 		private readonly Table _table;
-		private readonly Output _output;
+		private readonly OutputWriter _output;
 		private bool _finished;
 
-		public TableRenderer(Table table, Output output)
+		public TableRenderer(Table table, OutputWriter output)
 		{
 			_table = table;
 			_output = output;
@@ -46,7 +46,7 @@ namespace Blent.Utility.Drawing
 
 			var rows = _table.GetData().Select(r => DrawRow(r));
 			builder.AppendJoin('\n', rows);
-			builder.Append("\r");
+			builder.Append('\r');
 
 			_output.Write(builder.ToString());
 		}

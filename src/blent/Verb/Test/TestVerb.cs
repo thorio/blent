@@ -1,4 +1,7 @@
 #if DEBUG
+using Blent.Utility;
+using System;
+
 namespace Blent.Verb.Test
 {
 	public class TestVerb : Verb<TestOptions>
@@ -8,7 +11,9 @@ namespace Blent.Verb.Test
 
 		public override void Execute(TestOptions options)
 		{
-			new Down.DownVerb().Execute(new Down.DownOptions() { Projects = new[] { "doesntexist", "doesntexisteither" } });
+			//new Down.DownVerb().Execute(new Down.DownOptions() { Projects = new[] { "doesntexist", "doesntexisteither" } });
+
+			Output.Logger.Info("my message", new { thing = "tomato is \"red\"\\\n\nok", other_thing = 5 });
 		}
 	}
 }

@@ -1,4 +1,3 @@
-using Blent.Utility.Drawing;
 using System.Diagnostics;
 
 namespace Blent.Utility
