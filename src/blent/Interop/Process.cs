@@ -31,11 +31,10 @@ namespace Blent.Interop
 				PerformanceTesting.Checkpoint($"End Process {command}");
 				return new ProcessResults(process.ExitCode, output, error);
 			}
-			catch (Win32Exception)
+			catch (Win32Exception ex)
 			{
 				Output.Logger.Fatal("missing dependency", new { dependency = command });
-				ErrorPrinter.FatalAndQuit($"{command} is not available.");
-				throw;
+				throw new FatalException($"{command} is not available.", ex);
 			}
 		}
 	}

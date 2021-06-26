@@ -16,18 +16,30 @@ namespace Blent
 			}
 			catch (Exception ex)
 			{
-				PerformanceTesting.Checkpoint("Unhandled Exception");
-
-				Output.Logger.Fatal(null, ex);
-				ErrorPrinter.UnhandledException(ex);
-
-				return 1;
+				return HandleException(ex);
 			}
 			finally
 			{
 				Output.Error.ResetStyling();
 				PerformanceTesting.Checkpoint("End");
 			}
+		}
+
+		private static int HandleException(Exception ex)
+		{
+			if (ex is FatalException fatalEx)
+			{
+				PerformanceTesting.Checkpoint("Fatal Exception");
+				ErrorPrinter.Fatal(fatalEx.Message);
+				return fatalEx.ExitCode;
+			}
+
+			PerformanceTesting.Checkpoint("Unhandled Exception");
+
+			Output.Logger.Fatal(null, ex);
+			ErrorPrinter.UnhandledException(ex);
+
+			return 1;
 		}
 
 		private static void PreRun()

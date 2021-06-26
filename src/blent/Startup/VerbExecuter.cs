@@ -43,7 +43,7 @@ namespace Blent.Startup
 			if (verb.RequiresDocker && Settings.GetUserConfig().Checks.Docker && !Docker.IsRunning())
 			{
 				logger.Fatal("docker check failed");
-				ErrorPrinter.FatalAndQuit("Docker daemon is unreachable or not running.");
+				throw new FatalException("Docker daemon is unreachable or not running.");
 			}
 			PerformanceTesting.Checkpoint("End Docker Check");
 		}

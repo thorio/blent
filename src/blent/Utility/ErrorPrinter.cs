@@ -12,21 +12,9 @@ namespace Blent.Utility
 		public static void Error(string message) =>
 			Print(message, LogLevel.Error, Color.Danger);
 
-		public static void FatalAndQuit(string message)
+		public static void Fatal(string message)
 		{
 			Print(message, LogLevel.Fatal, Color.Danger);
-			Output.Error.ResetStyling();
-			PerformanceTesting.Checkpoint("Fatal");
-			Environment.Exit(1);
-		}
-
-		/// <summary>
-		/// Returns some value to make the compiler happy, even though the runtime will never actually get that far.
-		/// </summary>
-		public static T FatalAndQuit<T>(string message)
-		{
-			FatalAndQuit(message);
-			return default;
 		}
 
 		public static void UnhandledException(Exception ex)
@@ -47,7 +35,7 @@ namespace Blent.Utility
 
 		public static void HandledException(string message, Exception ex)
 		{
-			Output.Error.Write($"EXCEPTION: ", Color.Danger);
+			Output.Error.Write("EXCEPTION: ", Color.Danger);
 			Output.Error.WriteLine(message);
 
 			Output.Error.WriteLine(FormatException(ex, false));

@@ -44,8 +44,22 @@ namespace Blent.Configuration
 				}
 			}
 
-			Output.Logger.Fatal("Unable to determine Platform");
-			return ErrorPrinter.FatalAndQuit<Platform>("Unable to determine Platform");
+			Output.Logger.Fatal("unable to determine platform", new
+			{
+				runtime_identifier = RuntimeInformation.RuntimeIdentifier,
+				process_architecture = RuntimeInformation.ProcessArchitecture,
+				os_architecture = RuntimeInformation.OSArchitecture,
+				os_description = RuntimeInformation.OSDescription,
+				framework_description = RuntimeInformation.FrameworkDescription,
+			});
+
+			throw new FatalException($"Unable to determine Platform. \n" +
+				$"{nameof(RuntimeInformation.RuntimeIdentifier),-22}:  {RuntimeInformation.RuntimeIdentifier}\n" +
+				$"{nameof(RuntimeInformation.ProcessArchitecture),-22}:  {RuntimeInformation.ProcessArchitecture}\n" +
+				$"{nameof(RuntimeInformation.OSArchitecture),-22}:  {RuntimeInformation.OSArchitecture}\n" +
+				$"{nameof(RuntimeInformation.OSDescription),-22}:  {RuntimeInformation.OSDescription}\n" +
+				$"{nameof(RuntimeInformation.FrameworkDescription),-22}:  {RuntimeInformation.FrameworkDescription}"
+			);
 		}
 	}
 }
