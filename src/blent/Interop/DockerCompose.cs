@@ -47,9 +47,10 @@ namespace Blent.Interop
 
 		public static void Logs(string project, IEnumerable<string> services, bool follow = false, bool showTimestamps = false)
 		{
-			var arguments = $"logs {string.Join(' ', services)}";
+			var arguments = "logs";
 			if (follow) arguments += " -f";
 			if (showTimestamps) arguments += " -t";
+			arguments += $" {string.Join(' ', services)}";
 			Run(project, arguments, true);
 		}
 
