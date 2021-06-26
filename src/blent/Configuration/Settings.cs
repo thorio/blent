@@ -45,7 +45,8 @@ namespace Blent.Configuration
 		{
 			if (!Directory.Exists(path))
 			{
-				ErrorHandling.LogFatalAndQuit<string>($"AppDirectory [{path}] does not exist.");
+				Output.Logger.Fatal("AppDirectory does not exist", new { path });
+				ErrorPrinter.FatalAndQuit($"AppDirectory [{path}] does not exist");
 			};
 			return path;
 		}

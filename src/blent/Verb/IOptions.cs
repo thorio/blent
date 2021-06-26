@@ -1,3 +1,6 @@
+using Blent.Utility;
+using Blent.Utility.Logging;
+
 namespace Blent.Verb
 {
 	public interface IOptions
@@ -11,5 +14,7 @@ namespace Blent.Verb
 		/// See <see cref="Configuration.Settings.GetAppDirectory()"/>.
 		/// </summary>
 		string AppDirectory { get; set; }
+		LogLevel LogLevel { get; set; }
+		OutputMode OutputMode { get; set; }
 	}
 }

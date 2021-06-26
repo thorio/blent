@@ -17,7 +17,10 @@ namespace Blent
 			catch (Exception ex)
 			{
 				PerformanceTesting.Checkpoint("Unhandled Exception");
-				ErrorHandling.LogException(ex);
+
+				Output.Logger.Fatal(null, ex);
+				ErrorPrinter.UnhandledException(ex);
+
 				return 1;
 			}
 			finally

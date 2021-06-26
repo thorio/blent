@@ -43,7 +43,9 @@ namespace Blent.Configuration
 					return enumValue;
 				}
 			}
-			return ErrorHandling.LogFatalAndQuit<Platform>("Unable to detect Platform");
+
+			Output.Logger.Fatal("Unable to determine Platform");
+			return ErrorPrinter.FatalAndQuit<Platform>("Unable to determine Platform");
 		}
 	}
 }

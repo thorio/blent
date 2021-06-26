@@ -1,3 +1,4 @@
+using Blent.Utility.Logging;
 using System;
 
 namespace Blent.Verb
@@ -15,7 +16,7 @@ namespace Blent.Verb
 		/// </summary>
 		string Usage { get; }
 
-		void Execute(IOptions options);
+		void Execute(IOptions options, ILogger logger);
 		
 		/// <summary>
 		/// Must return the Options Type (which implements <see cref="IOptions"/>).

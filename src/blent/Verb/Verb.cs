@@ -1,3 +1,4 @@
+using Blent.Utility.Logging;
 using CommandLine;
 using System;
 
@@ -5,10 +6,8 @@ namespace Blent.Verb
 {
 	public abstract class Verb<TOptions> : IVerb where TOptions : IOptions
 	{
-		public Verb() { }
-
-		public void Execute(IOptions options) =>
-			Execute((TOptions)options);
+		public void Execute(IOptions options, ILogger logger) =>
+			Execute((TOptions)options, logger);
 
 		public Type GetOptionsType() =>
 			typeof(TOptions);
@@ -19,7 +18,7 @@ namespace Blent.Verb
 			return attribute.Name;
 		}
 
-		public abstract void Execute(TOptions options);
+		public abstract void Execute(TOptions options, ILogger logger);
 
 		public abstract bool RequiresDocker { get; }
 

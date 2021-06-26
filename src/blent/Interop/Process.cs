@@ -12,7 +12,9 @@ namespace Blent.Interop
 		{
 			try
 			{
+				Output.Logger.Debug("starting process", new { command, arguments, workingDirectory });
 				PerformanceTesting.Checkpoint($"Begin Process [{command} {arguments.Split(' ').First()}]");
+
 				var process = System.Diagnostics.Process.Start(new ProcessStartInfo()
 				{
 					FileName = command,
@@ -25,12 +27,14 @@ namespace Blent.Interop
 
 				var output = printOutput ? null : process.StandardOutput.ReadToEnd();
 				var error = printErrors ? null : process.StandardError.ReadToEnd();
+
 				PerformanceTesting.Checkpoint($"End Process {command}");
 				return new ProcessResults(process.ExitCode, output, error);
 			}
 			catch (Win32Exception)
 			{
-				ErrorHandling.LogFatalAndQuit($"{command} is not available.");
+				Output.Logger.Fatal("missing dependency", new { dependency = command });
+				ErrorPrinter.FatalAndQuit($"{command} is not available.");
 				throw;
 			}
 		}

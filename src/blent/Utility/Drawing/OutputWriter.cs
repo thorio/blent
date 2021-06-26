@@ -1,14 +1,19 @@
+using System;
 using System.IO;
 
 namespace Blent.Utility.Drawing
 {
 	public class OutputWriter
 	{
-		private readonly TextWriter _textWriter;
+		private IOutputTarget _target;
+		private bool _buffering;
 
-		public OutputWriter(TextWriter textWriter)
+		public OutputWriter(TextWriter textWriter, bool enabled = true) : this(new TextWriterOutputTarget(textWriter), enabled) { }
+
+		public OutputWriter(IOutputTarget textWriter, bool enabled = true)
 		{
-			_textWriter = textWriter;
+			_target = textWriter;
+			Enabled = enabled;
 			Colors = new ColorHelper();
 		}
 
@@ -18,25 +23,46 @@ namespace Blent.Utility.Drawing
 		public void Write(string text, Color color = Color.Default)
 		{
 			if (!Enabled) return;
-			_textWriter.Write(Colors.Get(color) + text.NormalizeLineEndings());
+			_target.Write(Colors.Get(color) + text.NormalizeLineEndings());
 		}
 
 		public void WriteLine()
 		{
 			if (!Enabled) return;
-			_textWriter.WriteLine();
+			_target.Write(Environment.NewLine);
 		}
 
 		public void WriteLine(string text, Color color = Color.Default)
 		{
 			if (!Enabled) return;
-			_textWriter.WriteLine(Colors.Get(color) + text.NormalizeLineEndings());
+			_target.Write(Colors.Get(color) + text.NormalizeLineEndings() + Environment.NewLine);
 		}
 
 		public void ResetStyling()
 		{
 			if (!Enabled) return;
-			_textWriter.Write(Colors.GetReset());
+			_target.Write(Colors.GetReset());
+		}
+
+		public ExclusiveHandle<OutputWriter> BeginExclusiveWrite()
+		{
+			if (_buffering) throw new InvalidOperationException("Exclusive write handle was already aquired");
+			_buffering = true;
+
+			var originalTarget = _target;
+			var buffer = new BufferedOutputTarget(originalTarget);
+
+			// buffer our own writes
+			_target = buffer;
+
+			return new ExclusiveHandle<OutputWriter>(new OutputWriter(originalTarget, Enabled), () =>
+			{
+				// when the handle is released, first flush our buffer
+				buffer.Flush();
+				// then restore our original Target
+				_target = originalTarget;
+				_buffering = false;
+			});
 		}
 	}
 }

@@ -2,6 +2,7 @@ using Blent.Utility.Drawing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Blent.Utility
@@ -25,16 +26,16 @@ namespace Blent.Utility
 
 		public void Execute()
 		{
-			var tableRenderer = new TableRenderer(_table, Output.Out);
+			var tableRenderer = new TableRenderer(_table, Output.Error);
 
 			Parallel.ForEach(_parameters, (parameter, state, index) =>
 			{
-				var progress = new Progress<TReport>((report) => _progressHandler(report, _table.GetRow((int)index)));
+				var progress = new CustomProgress<TReport>((report) => _progressHandler(report, _table.GetRow((int)index)));
 
 				_executor(parameter, progress);
 			});
 
-			tableRenderer.StopUpdating();
+			tableRenderer.Dispose();
 		}
 	}
 }

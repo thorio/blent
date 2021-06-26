@@ -1,36 +1,32 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace Blent.Utility.Drawing
 {
-	public class TableRenderer
+	public class TableRenderer : IDisposable
 	{
 		private const int ColumnDividerWidth = 3;
 		private readonly Table _table;
-		private readonly OutputWriter _output;
-		private bool _finished;
+		private bool _disposed;
+		private readonly ExclusiveHandle<OutputWriter> _exclusiveOutput;
 
 		public TableRenderer(Table table, OutputWriter output)
 		{
 			_table = table;
-			_output = output;
 			_table.CellChanged += OnCellChanged;
+
+			_exclusiveOutput = output.BeginExclusiveWrite();
 			DrawTable();
 		}
 
 		private void OnCellChanged(object sender, CellChangedEventArgs e)
 		{
-			if (!_finished)
+			if (!_disposed)
 			{
-				_output.Write(DrawCellAt(e.Cell, e.Row, e.Column));
+				_exclusiveOutput.Value.Write(DrawCellAt(e.Cell, e.Row, e.Column));
 			}
-		}
-
-		public void StopUpdating()
-		{
-			_output.WriteLine();
-			_finished = true;
 		}
 
 		public void DrawTable()
@@ -48,7 +44,14 @@ namespace Blent.Utility.Drawing
 			builder.AppendJoin('\n', rows);
 			builder.Append('\r');
 
-			_output.Write(builder.ToString());
+			_exclusiveOutput.Value.Write(builder.ToString());
+		}
+
+		public void Dispose()
+		{
+			_exclusiveOutput.Value.WriteLine("\n");
+			_exclusiveOutput.Dispose();
+			_disposed = true;
 		}
 
 		private string DrawRow(IEnumerable<IReadOnlyTableCell> cells)
@@ -75,7 +78,7 @@ namespace Blent.Utility.Drawing
 				content = content.Substring(0, columnWidth);
 			}
 
-			return _output.Colors.Get(cell.Color) + content.PadRight(columnWidth + ColumnDividerWidth);
+			return _exclusiveOutput.Value.Colors.Get(cell.Color) + content.PadRight(columnWidth + ColumnDividerWidth);
 		}
 
 		/// <summary>

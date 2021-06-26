@@ -1,3 +1,5 @@
+using Blent.Utility;
+using Blent.Utility.Logging;
 using CommandLine;
 
 namespace Blent.Verb
@@ -8,5 +10,12 @@ namespace Blent.Verb
 
 		[Option("app-directory", HelpText = "Set the app directory.")]
 		public string AppDirectory { get; set; }
+
+		[Option("log-level", Default = LogLevel.Info, HelpText = "Set the minimum log level.")]
+		public LogLevel LogLevel { get; set; }
+
+		[Option("output-mode", Default = OutputMode.Fancy, HelpText = "Set the output mode.")]
+		public OutputMode OutputMode { get; set; }
+
 	}
 }
