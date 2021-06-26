@@ -29,7 +29,7 @@ namespace Blent.Verb.Version
 			logger.Info(null, new {
 				name,
 				version,
-				commit,
+				commit = Constants.CommitHash,
 				license = Constants.License,
 				project_url = Constants.ProjectUrl,
 				repository_url = Constants.RepositoryUrl,

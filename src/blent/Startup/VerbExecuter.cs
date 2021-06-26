@@ -15,7 +15,7 @@ namespace Blent.Startup
 				args = string.Join(' ', System.Environment.GetCommandLineArgs()),
 				name = AssemblyInfo.GetName(),
 				version = AssemblyInfo.GetVersion(),
-				commit = AssemblyInfo.GetShortCommitHash(),
+				commit = Constants.CommitHash,
 			});
 
 			PerformanceTesting.Checkpoint("Begin Verb");
