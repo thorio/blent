@@ -78,19 +78,19 @@ namespace Blent.Verb.Update
 		private void RemoveDanglingImages(ILogger logger)
 		{
 			logger.Trace("removing dangling images");
-			Output.Error.WriteLine("\nRemoving dangling images ...", Color.Info);
+			Output.Fancy.WriteLine("\nRemoving dangling images ...", Color.Info);
 
 			var images = Docker.GetImages("dangling=true");
 			if (images.Any())
 			{
 				Docker.RemoveImages(images);
-				Output.Error.WriteLine($"Removed {images.Count()} images.");
+				Output.Fancy.WriteLine($"Removed {images.Count()} images.");
 				logger.Info("dangling images removed", new { count = images.Count() });
 			}
 			else
 			{
 				logger.Debug("no dangling images found");
-				Output.Error.WriteLine("No dangling images found.");
+				Output.Fancy.WriteLine("No dangling images found.");
 			}
 		}
 	}

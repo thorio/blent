@@ -8,8 +8,6 @@ namespace Blent.Utility.Drawing
 		private IOutputTarget _target;
 		private bool _buffering;
 
-		public OutputWriter(TextWriter textWriter, bool enabled = true) : this(new TextWriterOutputTarget(textWriter), enabled) { }
-
 		public OutputWriter(IOutputTarget textWriter, bool enabled = true)
 		{
 			_target = textWriter;

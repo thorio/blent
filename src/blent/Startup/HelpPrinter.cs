@@ -15,26 +15,26 @@ namespace Blent.Startup
 		{
 			if (verb?.Usage != null)
 			{
-				Output.Error.Write($"\nUSAGE: ", Color.Info);
-				Output.Error.WriteLine($"{verb.GetVerbName()} {verb.Usage}");
+				Output.Fancy.Write($"\nUSAGE: ", Color.Info);
+				Output.Fancy.WriteLine($"{verb.GetVerbName()} {verb.Usage}");
 			}
 
 			var errors = RenderErrors(result);
 			if (!string.IsNullOrWhiteSpace(errors))
 			{
-				Output.Error.WriteLine("\nERRORS:", Color.Danger);
-				Output.Error.WriteLine(errors);
+				Output.Fancy.WriteLine("\nERRORS:", Color.Danger);
+				Output.Fancy.WriteLine(errors);
 			}
 
 			if (verb == null)
 			{
-				Output.Error.WriteLine("\nVERBS:", Color.Info);
-				Output.Error.WriteLine(GenerateVerbHelp(result));
+				Output.Fancy.WriteLine("\nVERBS:", Color.Info);
+				Output.Fancy.WriteLine(GenerateVerbHelp(result));
 			}
 			else
 			{
-				Output.Error.WriteLine("\nOPTIONS:", Color.Info);
-				Output.Error.WriteLine(GenerateOptionsHelp(result));
+				Output.Fancy.WriteLine("\nOPTIONS:", Color.Info);
+				Output.Fancy.WriteLine(GenerateOptionsHelp(result));
 			}
 		}
 

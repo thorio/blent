@@ -19,33 +19,33 @@ namespace Blent.Utility
 
 		public static void UnhandledException(Exception ex)
 		{
-			Output.Error.Write("UNHANDLED EXCEPTION: ", Color.Danger);
-			Output.Error.WriteLine(FormatException(ex));
+			Output.Fancy.Write("UNHANDLED EXCEPTION: ", Color.Danger);
+			Output.Fancy.WriteLine(FormatException(ex));
 
 			if (ex is AggregateException aggregateException)
 			{
-				Output.Error.WriteLine("Inner Exceptions:");
+				Output.Fancy.WriteLine("Inner Exceptions:");
 				foreach (var innerException in aggregateException.InnerExceptions)
 				{
-					Output.Error.WriteLine(FormatException(innerException));
+					Output.Fancy.WriteLine(FormatException(innerException));
 				}
 			}
-			Output.Error.WriteLine($"Please report this issue at {Constants.IssuesUrl}", Color.Warning);
+			Output.Fancy.WriteLine($"Please report this issue at {Constants.IssuesUrl}", Color.Warning);
 		}
 
 		public static void HandledException(string message, Exception ex)
 		{
-			Output.Error.Write("EXCEPTION: ", Color.Danger);
-			Output.Error.WriteLine(message);
+			Output.Fancy.Write("EXCEPTION: ", Color.Danger);
+			Output.Fancy.WriteLine(message);
 
-			Output.Error.WriteLine(FormatException(ex, false));
+			Output.Fancy.WriteLine(FormatException(ex, false));
 
 			if (ex is AggregateException aggregateException)
 			{
-				Output.Error.WriteLine("Inner Exceptions:");
+				Output.Fancy.WriteLine("Inner Exceptions:");
 				foreach (var innerException in aggregateException.InnerExceptions)
 				{
-					Output.Error.WriteLine(FormatException(innerException, false));
+					Output.Fancy.WriteLine(FormatException(innerException, false));
 				}
 			}
 		}
@@ -58,8 +58,8 @@ namespace Blent.Utility
 
 		private static void Print(string message, LogLevel level, Color color)
 		{
-			Output.Error.Write($"{level.ToString().ToUpper()}: ", color);
-			Output.Error.WriteLine(message);
+			Output.Fancy.Write($"{level.ToString().ToUpper()}: ", color);
+			Output.Fancy.WriteLine(message);
 		}
 	}
 }

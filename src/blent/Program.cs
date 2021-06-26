@@ -20,7 +20,7 @@ namespace Blent
 			}
 			finally
 			{
-				Output.Error.ResetStyling();
+				Output.Fancy.ResetStyling();
 				PerformanceTesting.Checkpoint("End");
 			}
 		}

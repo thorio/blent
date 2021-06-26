@@ -21,7 +21,7 @@ namespace Blent.Utility
 			if (!_enable) return;
 
 			var elapsed = _stopwatch.ElapsedMilliseconds;
-			Output.Error.WriteLine($"PERF | {elapsed,5}ms | +{elapsed - _previous,-5} | {message}");
+			Output.Basic.WriteLine($"PERF | {elapsed,5}ms | +{elapsed - _previous,-5} | {message}");
 			_previous = elapsed;
 		}
 	}

@@ -20,7 +20,7 @@ namespace Blent.Verb.List
 			foreach (var project in projects)
 			{
 				var color = runningProjects.Contains(project) ? Color.Success : Color.Danger;
-				Output.Error.WriteLine(project, color);
+				Output.Fancy.WriteLine(project, color);
 			}
 
 			logger.Info("project list", new { project_count = projects.Length, projects = string.Join(", ", projects), running_projects = string.Join(", ", runningProjects) });

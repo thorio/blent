@@ -83,7 +83,7 @@ namespace Blent.Verb.Backup
 
 		private void PruneBackups(ILogger logger, IList<string> projects, string backupDirectory, int numberToKeep)
 		{
-			Output.Error.Write("Deleting old backups ... ", Color.Info);
+			Output.Fancy.Write("Deleting old backups ... ", Color.Info);
 			logger.Trace("determining archives to be deleted");
 
 			var filesToDelete = Directory.GetFiles(backupDirectory)
@@ -110,7 +110,7 @@ namespace Blent.Verb.Backup
 
 					if (failCount == 1)
 					{
-						Output.Error.WriteLine();
+						Output.Fancy.WriteLine();
 					}
 
 					ErrorPrinter.HandledException($"Deleting archive [{file.FullName}] failed", ex);
@@ -118,7 +118,7 @@ namespace Blent.Verb.Backup
 				}
 			}
 
-			Output.Error.WriteLine($"{filesToDelete.Count - failCount} backups deleted.", Color.Success);
+			Output.Fancy.WriteLine($"{filesToDelete.Count - failCount} backups deleted.", Color.Success);
 			if (failCount > 0)
 			{
 				ErrorPrinter.Error($"Deletion of {failCount} backups failed.");

@@ -16,15 +16,15 @@ namespace Blent.Verb.Version
 
 			if (options.Short)
 			{
-				Output.Out.WriteLine(version);
+				Output.Basic.WriteLine(version);
 				return;
 			}
 
-			Output.Out.WriteLine($"{name} version {version}, build {commit}");
-			Output.Out.WriteLine($"Free Software licensed under {Constants.License}");
-			Output.Out.WriteLine($"Website: {Constants.ProjectUrl}");
-			Output.Out.WriteLine($"Source Code: {Constants.RepositoryUrl}");
-			Output.Out.WriteLine($"Issues: {Constants.IssuesUrl}");
+			Output.Basic.WriteLine($"{name} version {version}, build {commit}");
+			Output.Basic.WriteLine($"Free Software licensed under {Constants.License}");
+			Output.Basic.WriteLine($"Website: {Constants.ProjectUrl}");
+			Output.Basic.WriteLine($"Source Code: {Constants.RepositoryUrl}");
+			Output.Basic.WriteLine($"Issues: {Constants.IssuesUrl}");
 
 			logger.Info(null, new {
 				name,

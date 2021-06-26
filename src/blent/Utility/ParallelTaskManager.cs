@@ -26,7 +26,7 @@ namespace Blent.Utility
 
 		public void Execute()
 		{
-			var tableRenderer = new TableRenderer(_table, Output.Error);
+			var tableRenderer = new TableRenderer(_table, Output.Fancy);
 
 			Parallel.ForEach(_parameters, (parameter, state, index) =>
 			{
