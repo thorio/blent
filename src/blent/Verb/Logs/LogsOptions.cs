@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace Blent.Verb.Logs
 {
-	[Verb("logs", HelpText = "Print logs of a project.")]
+	[Verb("logs", HelpText = "Print logs of a stack.")]
 	public class LogsOptions : Options
 	{
-		[Value(0, Required = true, HelpText = "Project to fetch logs for.", MetaName = "PROJECT")]
-		public string Project { get; set; }
+		[Value(0, Required = true, HelpText = "Stack to fetch logs for.", MetaName = "STACK")]
+		public string Stacks { get; set; }
 
 		[Value(1, Required = false, HelpText = "Service(s) to fetch logs for.", MetaName = "SERVICE...")]
 		public IEnumerable<string> Services { get; set; }

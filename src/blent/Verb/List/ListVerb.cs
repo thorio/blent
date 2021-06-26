@@ -14,16 +14,16 @@ namespace Blent.Verb.List
 
 		public override void Execute(ListOptions options, ILogger logger)
 		{
-			var projects = ProjectDirectory.GetProjects().OrderBy(s => s).ToArray();
-			var runningProjects = Docker.GetComposeProjects().ToArray();
+			var stacks = AppDirectory.GetStacks().OrderBy(s => s).ToArray();
+			var runningStacks = Docker.GetComposeStacks().ToArray();
 
-			foreach (var project in projects)
+			foreach (var stack in stacks)
 			{
-				var color = runningProjects.Contains(project) ? Color.Success : Color.Danger;
-				Output.Fancy.WriteLine(project, color);
+				var color = runningStacks.Contains(stack) ? Color.Success : Color.Danger;
+				Output.Fancy.WriteLine(stack, color);
 			}
 
-			logger.Info("project list", new { project_count = projects.Length, projects = string.Join(", ", projects), running_projects = string.Join(", ", runningProjects) });
+			logger.Info("stack list", new { stack_count = stacks.Length, stacks = string.Join(", ", stacks), running_stacks = string.Join(", ", runningStacks) });
 		}
 	}
 }

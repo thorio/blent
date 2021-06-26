@@ -12,7 +12,7 @@ namespace Blent.Verb
 
 		/// <summary>
 		/// Usage message. See <a href="https://en.wikipedia.org/wiki/Usage_message">Wikipedia article</a>. <br />
-		/// e.g. "[PROJECT...] [-- docker-compose_down-args]"
+		/// e.g. "[STACK...] [-- docker-compose_down-args]"
 		/// </summary>
 		string Usage { get; }
 

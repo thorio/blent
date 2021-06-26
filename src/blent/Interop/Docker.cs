@@ -51,7 +51,7 @@ namespace Blent.Interop
 			return Run(arguments).Output.AsList(Environment.NewLine);
 		}
 
-		public static IEnumerable<string> GetComposeProjects()
+		public static IEnumerable<string> GetComposeStacks()
 		{
 			var containers = GetContainers($"label={ComDockerComposeProject}");
 			if (!containers.Any()) return new string[0];

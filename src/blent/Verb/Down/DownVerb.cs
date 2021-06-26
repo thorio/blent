@@ -11,41 +11,41 @@ namespace Blent.Verb.Down
 	public class DownVerb : Verb<DownOptions>
 	{
 		public override bool RequiresDocker => true;
-		public override string Usage => "[PROJECT...] [options] [--] [docker-compose-down_options]";
+		public override string Usage => "[STACK...] [options] [--] [docker-compose-down_options]";
 
 		public override void Execute(DownOptions options, ILogger logger)
 		{
-			var projects = options.Projects.Any() ? options.Projects : Docker.GetComposeProjects();
-			if (!projects.Any())
+			var stacks = options.Stacks.Any() ? options.Stacks : Docker.GetComposeStacks();
+			if (!stacks.Any())
 			{
-				logger.Error("no running projects found");
-				ErrorPrinter.Error("There are no running projects.");
+				logger.Error("no running stacks found");
+				ErrorPrinter.Error("There are no running stacks.");
 				return;
 			}
 
-			logger.Trace("stopping projects in parallel", new { project_count = projects.Count(), projects = string.Join(", ", projects) });
+			logger.Trace("stopping stacks in parallel", new { stack_count = stacks.Count(), stacks = string.Join(", ", stacks) });
 
-			new ParallelTaskManager<string, TaskState>(projects, GetRow, (project, progress) => Execute(project, progress, options, logger), HandleProgress, new[] { 0, 5 })
+			new ParallelTaskManager<string, TaskState>(stacks, GetRow, (stack, progress) => Execute(stack, progress, options, logger), HandleProgress, new[] { 0, 5 })
 				.Execute();
 		}
 
-		private IEnumerable<string> GetRow(string project) =>
-			new[] { project, TaskState.Pending.ToCell().Text };
+		private IEnumerable<string> GetRow(string stack) =>
+			new[] { stack, TaskState.Pending.ToCell().Text };
 
-		public void Execute(string project, IProgress<TaskState> progress, DownOptions options, ILogger logger)
+		public void Execute(string stack, IProgress<TaskState> progress, DownOptions options, ILogger logger)
 		{
-			logger.Trace("stopping project", new { project });
+			logger.Trace("stopping stack", new { stack });
 
-			var results = DockerCompose.Down(project, options.PassthroughArguments, options.RemoveOrphans, false);
+			var results = DockerCompose.Down(stack, options.PassthroughArguments, options.RemoveOrphans, false);
 			if (results.ExitCode == 0)
 			{
-				logger.Info("stopped project", new { project });
+				logger.Info("stopped stack", new { stack });
 				progress.Report(TaskState.Success);
 			}
 			else
 			{
-				logger.Error("stopping project failed", new { project });
-				logger.Debug("stopping project failed", new { project, compose_stdout = results.Output, compose_stderr = results.Error });
+				logger.Error("stopping stack failed", new { stack });
+				logger.Debug("stopping stack failed", new { stack, compose_stdout = results.Output, compose_stderr = results.Error });
 				progress.Report(TaskState.Failure);
 			}
 		}

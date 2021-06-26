@@ -11,22 +11,22 @@ namespace Blent.Verb.Update
 	public class UpdateVerb : Verb<UpdateOptions>
 	{
 		public override bool RequiresDocker => true;
-		public override string Usage => "[PROJECT...] [options] [--] [docker-compose-up_options]";
+		public override string Usage => "[STACK...] [options] [--] [docker-compose-up_options]";
 
 		public override void Execute(UpdateOptions options, ILogger logger)
 		{
-			var projects = options.Projects.Any() ? options.Projects : Docker.GetComposeProjects();
-			if (!projects.Any())
+			var stacks = options.Stack.Any() ? options.Stack : Docker.GetComposeStacks();
+			if (!stacks.Any())
 			{
-				logger.Error("no running projects found");
-				ErrorPrinter.Error("There are no running projects.");
+				logger.Error("no running stacks found");
+				ErrorPrinter.Error("There are no running stacks.");
 				return;
 			}
 
-			logger.Trace("updating projects in parallel", new { project_count = projects.Count(), projects = string.Join(", ", projects) });
+			logger.Trace("updating stacks in parallel", new { stack_count = stacks.Count(), stacks = string.Join(", ", stacks) });
 
-			new ParallelTaskManager<string, (TaskState, TaskState)>(projects, GetRow, (project, progress) => Execute(project, progress, options, logger), HandleProgress,
-				new[] { 0, 5, 0 }, new[] { "Project", "Pull", "Restart" })
+			new ParallelTaskManager<string, (TaskState, TaskState)>(stacks, GetRow, (stack, progress) => Execute(stack, progress, options, logger), HandleProgress,
+				new[] { 0, 5, 0 }, new[] { "Stack", "Pull", "Restart" })
 				.Execute();
 
 			if (options.RemoveDanglingImages)
@@ -35,38 +35,38 @@ namespace Blent.Verb.Update
 			}
 		}
 
-		private IEnumerable<string> GetRow(string project) =>
-			new[] { project, TaskState.Pending.ToCell().Text, "" };
+		private IEnumerable<string> GetRow(string stack) =>
+			new[] { stack, TaskState.Pending.ToCell().Text, "" };
 
-		public void Execute(string project, IProgress<(TaskState, TaskState)> progress, UpdateOptions options, ILogger logger)
+		public void Execute(string stack, IProgress<(TaskState, TaskState)> progress, UpdateOptions options, ILogger logger)
 		{
-			logger.Trace("pulling project", new { project });
+			logger.Trace("pulling stack", new { stack });
 
-			var pullResults = DockerCompose.Pull(project);
+			var pullResults = DockerCompose.Pull(stack);
 			var pullSuccess = pullResults.ExitCode == 0;
 			progress.Report((pullSuccess.ToTaskState(), TaskState.Pending));
 
 			if (!pullSuccess)
 			{
-				logger.Error("pulling project failed", new { project });
-				logger.Debug("pulling project failed", new { project, compose_stdout = pullResults.Output, compose_stderr = pullResults.Error });
+				logger.Error("pulling stack failed", new { stack });
+				logger.Debug("pulling stack failed", new { stack, compose_stdout = pullResults.Output, compose_stderr = pullResults.Error });
 				return;
 			}
 
-			logger.Trace("recreating project", new { project });
+			logger.Trace("recreating stack", new { stack });
 
-			var upResults = DockerCompose.Up(project, printOutput: false);
+			var upResults = DockerCompose.Up(stack, printOutput: false);
 			var upSuccess = upResults.ExitCode == 0;
 			progress.Report((TaskState.Success, upSuccess.ToTaskState()));
 
 			if (!upSuccess)
 			{
-				logger.Error("recreating project failed", new { project });
-				logger.Debug("recreating project failed", new { project, compose_stdout = upResults.Output, compose_stderr = upResults.Error });
+				logger.Error("recreating stack failed", new { stack });
+				logger.Debug("recreating stack failed", new { stack, compose_stdout = upResults.Output, compose_stderr = upResults.Error });
 				return;
 			}
 
-			logger.Info("recreated project", new { project });
+			logger.Info("recreated stack", new { stack });
 		}
 
 		private void HandleProgress((TaskState pullState, TaskState upState) report, TableRow row)
