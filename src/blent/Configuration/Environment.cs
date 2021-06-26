@@ -6,24 +6,24 @@ namespace Blent.Configuration
 {
 	public static class Environment
 	{
-		private static Platform? _platform;
+		private static readonly Lazy<Platform> _platform = new(DeterminePlatform);
 
-		public static Platform CurrentPlatform =>
-			_platform ??= DeterminePlatform();
+		public static Platform GetCurrentPlatform() => _platform.Value;
 
 		public static string UserHomeDirectory =>
 			System.Environment.GetEnvironmentVariable(GetPlatformDependentValue("HOME", "USERPROFILE"));
 
 		public static T GetPlatformDependentValue<T>(T unixValue, T windowsValue) =>
-			GetPlatformDependentValue(unixValue, windowsValue, unixValue);
+			GetPlatformDependentValue(unixValue, windowsValue, unixValue, unixValue);
 
-		public static T GetPlatformDependentValue<T>(T linuxValue, T windowsValue, T osxValue)
+		public static T GetPlatformDependentValue<T>(T linuxValue, T windowsValue, T osxValue, T freeBsdValue)
 		{
-			return CurrentPlatform switch
+			return GetCurrentPlatform() switch
 			{
 				Platform.Linux => linuxValue,
 				Platform.Windows => windowsValue,
 				Platform.OSX => osxValue,
+				Platform.FreeBSD => freeBsdValue,
 				_ => throw new PlatformNotSupportedException(),
 			};
 		}
@@ -33,6 +33,7 @@ namespace Blent.Configuration
 			var platformMappings = new[] {
 				(OSPlatform.Linux, Platform.Linux),
 				(OSPlatform.Windows, Platform.Windows),
+				(OSPlatform.FreeBSD, Platform.FreeBSD),
 				(OSPlatform.OSX, Platform.OSX)
 			};
 

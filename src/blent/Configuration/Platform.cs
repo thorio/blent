@@ -5,5 +5,6 @@ namespace Blent.Configuration
 		Linux = 0,
 		Windows = 1,
 		OSX = 2,
+		FreeBSD = 3,
 	}
 }
