@@ -5,11 +5,11 @@ using System.IO;
 
 namespace Blent.Configuration
 {
-	public class StringFilerProvider : IFileProvider
+	public class StringFileProvider : IFileProvider
 	{
 		private readonly StringFileInfo _stringFileInfo;
 
-		public StringFilerProvider(byte[] data)
+		public StringFileProvider(byte[] data)
 		{
 			_stringFileInfo = new StringFileInfo(data);
 		}

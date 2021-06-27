@@ -44,10 +44,8 @@ namespace Blent
 
 		private static void PreRun()
 		{
-			if (Environment.GetEnvironmentVariable("BLENT_PERF_TEST") == "true")
-			{
-				PerformanceTesting.Begin();
-			}
+			var printPerformanceCheckpoints = Environment.GetEnvironmentVariable("BLENT_PERF_TEST") == "true";
+			PerformanceTesting.Begin(printPerformanceCheckpoints);
 		}
 
 		private static int Run(string[] args)

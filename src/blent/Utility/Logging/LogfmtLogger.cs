@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 
 namespace Blent.Utility.Logging
 {
 	public class LogfmtLogger : ILogger
 	{
 		private const string LevelKey = "level";
+		private const string ThreadKey = "thread";
 		private const string MessageKey = "msg";
 		private const string TimeKey = "time";
 
@@ -85,6 +87,7 @@ namespace Blent.Utility.Logging
 			var allFields = new[] {
 				Pair(TimeKey, DateTime.Now.ToString("s")),
 				Pair(LevelKey, level.ToString().ToLower()),
+				Pair(ThreadKey, Thread.CurrentThread.ManagedThreadId.ToString()),
 				Pair(MessageKey, message),
 			}
 				.Concat(fields)
@@ -117,7 +120,7 @@ namespace Blent.Utility.Logging
 			}
 
 			return fields.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)
-				.Select(p => Pair(p.Name, p.GetValue(fields).ToString()))
+				.Select(p => Pair(p.Name, p.GetValue(fields)?.ToString()))
 				.ToArray();
 		}
 
@@ -126,7 +129,8 @@ namespace Blent.Utility.Logging
 			value = value
 				.Replace("\\", "\\\\")
 				.Replace("\"", "\\\"")
-				.Replace("\n", "\\n");
+				.Replace("\n", "\\n")
+				.Replace("\r", "\\r");
 
 			if (value.Contains(' ') || value.Contains('='))
 			{

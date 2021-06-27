@@ -33,7 +33,7 @@ namespace Blent.Verb.Backup
 
 			Directory.CreateDirectory(options.BackupDirectory);
 
-			logger.Trace("writing archives in parallel", new { stack_count = stacks.Count(), stacks = string.Join(", ", stacks) });
+			logger.Trace("writing archives in parallel", new { stack_count = stacks.Count(), stacks = string.Join(",", stacks) });
 
 			new ParallelTaskManager<string, TaskState>(stacks, GetRow, (stack, progress) => Execute(logger, stack, progress, options), HandleProgress,
 				new[] { 0, 5 })

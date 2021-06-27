@@ -23,7 +23,7 @@ namespace Blent.Verb.Down
 				return;
 			}
 
-			logger.Trace("stopping stacks in parallel", new { stack_count = stacks.Count(), stacks = string.Join(", ", stacks) });
+			logger.Trace("stopping stacks in parallel", new { stack_count = stacks.Count(), stacks = string.Join(",", stacks) });
 
 			new ParallelTaskManager<string, TaskState>(stacks, GetRow, (stack, progress) => Execute(stack, progress, options, logger), HandleProgress, new[] { 0, 5 })
 				.Execute();

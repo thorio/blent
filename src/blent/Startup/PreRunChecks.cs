@@ -4,6 +4,7 @@ using Blent.Interop;
 using Blent.Utility;
 using Blent.Utility.Logging;
 using Blent.Verb;
+using System.IO;
 using System.Linq;
 
 namespace Blent.Startup
@@ -15,6 +16,7 @@ namespace Blent.Startup
 			PerformanceTesting.Checkpoint("Begin Checks");
 
 			CheckPlatform(logger);
+			CheckAppDirectory(logger);
 			CheckDocker(logger, verb, config);
 		}
 
@@ -32,6 +34,20 @@ namespace Blent.Startup
 			}
 
 			PerformanceTesting.Checkpoint("End Platform Check");
+		}
+
+		private static void CheckAppDirectory(ILogger logger)
+		{
+			logger.Trace("checking app directory");
+
+			var path = Settings.GetAppDirectory();
+			if (!Directory.Exists(path))
+			{
+				logger.Fatal("app directory does not exist", new { path });
+				throw new FatalException($"App directory [{path}] does not exist");
+			};
+
+			PerformanceTesting.Checkpoint("End App Directory Check");
 		}
 
 		private static void CheckDocker(ILogger logger, IVerb verb, UserConfig config)

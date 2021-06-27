@@ -2,7 +2,7 @@
   "profiles": {
     "Blent": {
       "commandName": "Project",
-      "commandLineArgs": "test"
+      "commandLineArgs": "up --output-mode logfmt --log-level Trace"
     }
   }
 }

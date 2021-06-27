@@ -1,5 +1,7 @@
 using Blent.Configuration;
+using Blent.Configuration.Models;
 using Blent.Utility;
+using Blent.Utility.Logging;
 using Blent.Verb;
 
 namespace Blent.Startup
@@ -8,29 +10,51 @@ namespace Blent.Startup
 	{
 		public static void ExecuteVerb(IVerb verb, IOptions options)
 		{
-			ProcessGlobalArguments(options, verb.GetVerbName());
-			PreRunChecks.PerformChecks(Output.Logger, verb, Settings.GetUserConfig());
+			var logger = Init(verb, options);
 
-			Output.Logger.Debug("executing verb", new {
+			logger.Debug("executing verb");
+
+			PerformanceTesting.Checkpoint("Begin Verb");
+			verb.Execute(options, Output.Logger);
+
+			logger.Info("execution completed", new { time = PerformanceTesting.GetElapsedMilliseconds() });
+		}
+
+		private static ILogger Init(IVerb verb, IOptions options)
+		{
+			var logger = InitLogger(options, verb.GetVerbName());
+
+			Settings.InitUserConfig(logger);
+
+			ProcessGlobalArguments(logger, options, Settings.UserConfig);
+
+			PreRunChecks.PerformChecks(Output.Logger, verb, Settings.UserConfig);
+
+			return logger;
+		}
+
+		private static ILogger InitLogger(IOptions options, string verbName)
+		{
+			Output.Init(options.OutputMode, options.LogLevel, verbName);
+			Output.Logger.Debug("logger initialized", new { output_mode = options.OutputMode, log_level = options.LogLevel });
+
+			Output.Logger.Info(null, new
+			{
 				args = string.Join(' ', System.Environment.GetCommandLineArgs()),
 				name = AssemblyInfo.GetName(),
 				version = AssemblyInfo.GetVersion(),
 				commit = Constants.CommitHash,
 			});
 
-			PerformanceTesting.Checkpoint("Begin Verb");
-			verb.Execute(options, Output.Logger);
+			return Output.Logger;
 		}
 
-		public static void ProcessGlobalArguments(IOptions options, string verbName)
+		private static void ProcessGlobalArguments(ILogger logger, IOptions options, UserConfig config)
 		{
-			Output.Init(options.OutputMode, options.LogLevel, verbName);
-			Output.Logger.Debug("logger initialized");
-
 			if (options.AppDirectory != null)
 			{
-				Output.Logger.Trace("setting appdirectory from commandline", new { app_directory = options.AppDirectory });
-				Settings.SetAppDirectory(options.AppDirectory);
+				logger.Trace("setting app directory from commandline", new { app_directory = options.AppDirectory });
+				config.AppDirectory = options.AppDirectory;
 			}
 		}
 	}

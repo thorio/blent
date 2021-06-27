@@ -10,7 +10,7 @@ namespace Blent.Configuration
 
 		public static Platform GetCurrentPlatform() => _platform.Value;
 
-		public static string UserHomeDirectory =>
+		public static string GetUserHomeDirectory() =>
 			System.Environment.GetEnvironmentVariable(GetPlatformDependentValue("HOME", "USERPROFILE"));
 
 		public static T GetPlatformDependentValue<T>(T unixValue, T windowsValue) =>

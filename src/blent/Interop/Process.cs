@@ -12,7 +12,7 @@ namespace Blent.Interop
 		{
 			try
 			{
-				Output.Logger.Debug("starting process", new { command, arguments, workingDirectory });
+				Output.Logger.Debug("starting child process", new { command, arguments, workingDirectory });
 				PerformanceTesting.Checkpoint($"Begin Process [{command} {arguments.Split(' ').First()}]");
 
 				var process = System.Diagnostics.Process.Start(new ProcessStartInfo()
@@ -27,6 +27,8 @@ namespace Blent.Interop
 
 				var output = printOutput ? null : process.StandardOutput.ReadToEnd();
 				var error = printErrors ? null : process.StandardError.ReadToEnd();
+
+				Output.Logger.Trace("end child process", new { command, arguments, workingDirectory, process_stdout = output, process_stderr = error });
 
 				PerformanceTesting.Checkpoint($"End Process {command}");
 				return new ProcessResults(process.ExitCode, output, error);

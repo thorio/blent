@@ -23,7 +23,7 @@ namespace Blent.Verb.Update
 				return;
 			}
 
-			logger.Trace("updating stacks in parallel", new { stack_count = stacks.Count(), stacks = string.Join(", ", stacks) });
+			logger.Trace("updating stacks in parallel", new { stack_count = stacks.Count(), stacks = string.Join(",", stacks) });
 
 			new ParallelTaskManager<string, (TaskState, TaskState)>(stacks, GetRow, (stack, progress) => Execute(stack, progress, options, logger), HandleProgress,
 				new[] { 0, 5, 0 }, new[] { "Stack", "Pull", "Restart" })
@@ -53,6 +53,7 @@ namespace Blent.Verb.Update
 				return;
 			}
 
+			logger.Info("pulled stack", new { stack });
 			logger.Trace("recreating stack", new { stack });
 
 			var upResults = DockerCompose.Up(stack, printOutput: false);

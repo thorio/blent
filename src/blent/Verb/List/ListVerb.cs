@@ -23,7 +23,7 @@ namespace Blent.Verb.List
 				Output.Fancy.WriteLine(stack, color);
 			}
 
-			logger.Info("stack list", new { stack_count = stacks.Length, stacks = string.Join(", ", stacks), running_stacks = string.Join(", ", runningStacks) });
+			logger.Info("stack list", new { stack_count = stacks.Length, stacks = string.Join(",", stacks), running_stacks = string.Join(",", runningStacks) });
 		}
 	}
 }
