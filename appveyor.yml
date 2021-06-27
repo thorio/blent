@@ -39,7 +39,7 @@ deploy:
   release: Version $(APPVEYOR_BUILD_VERSION)
   description: Changelog:\n\n---\n$(GIT_LOG_SINCE_TAG)
   auth_token:
-    secure: xMcnocRvXpoVccUdQMgu52bjunzTLDzCnxaeum8+74zTMxmRW7+iHD653YEd70VR
+    secure: aeuESr+DkvYDnwA4kI56tfyXA0hynBc3pwdjaW+hgAJuHs4BkJnvurhG3N8SbQOc
   repository: thorio/blent
   artifact: publish
   draft: true
