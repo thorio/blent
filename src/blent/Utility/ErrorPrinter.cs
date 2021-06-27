@@ -36,7 +36,10 @@ namespace Blent.Utility
 		public static void HandledException(string message, Exception ex)
 		{
 			Output.Fancy.Write("EXCEPTION: ", Color.Danger);
-			Output.Fancy.WriteLine(message);
+			if (message != null)
+			{
+				Output.Fancy.WriteLine(message);
+			}
 
 			Output.Fancy.WriteLine(FormatException(ex, false));
 

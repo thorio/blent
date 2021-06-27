@@ -18,6 +18,8 @@ namespace Blent.Startup
 			verb.Execute(options, Output.Logger);
 
 			logger.Info("execution completed", new { time = PerformanceTesting.GetElapsedMilliseconds() });
+
+			Output.Dispose();
 		}
 
 		private static ILogger Init(IVerb verb, IOptions options)
@@ -35,10 +37,10 @@ namespace Blent.Startup
 
 		private static ILogger InitLogger(IOptions options, string verbName)
 		{
-			Output.Init(options.OutputMode, options.LogLevel, verbName);
+			Output.Init(options.OutputMode, options.LogLevel, options.LogFile, verbName);
 			Output.Logger.Debug("logger initialized", new { output_mode = options.OutputMode, log_level = options.LogLevel });
 
-			Output.Logger.Info(null, new
+			Output.Logger.Info("application invoked", new
 			{
 				args = string.Join(' ', System.Environment.GetCommandLineArgs()),
 				name = AssemblyInfo.GetName(),

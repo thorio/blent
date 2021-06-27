@@ -31,6 +31,12 @@ namespace Blent
 			{
 				PerformanceTesting.Checkpoint("Fatal Exception");
 				ErrorPrinter.Fatal(fatalEx.Message);
+
+				if (fatalEx.InnerException != null)
+				{
+					ErrorPrinter.HandledException(null, fatalEx.InnerException);
+				}
+
 				return fatalEx.ExitCode;
 			}
 

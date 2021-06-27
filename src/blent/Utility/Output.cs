@@ -6,6 +6,8 @@ namespace Blent.Utility
 {
 	public static class Output
 	{
+		private static FileLogTarget _fileLogTarget;
+
 		static Output()
 		{
 			// provide default configuration, useful when something goes wrong in parsing
@@ -31,14 +33,39 @@ namespace Blent.Utility
 		/// </summary>
 		public static ILogger Logger { get; private set; }
 
-		public static void Init(OutputMode mode, LogLevel level, string verbName)
+		public static void Init(OutputMode mode, LogLevel level, string logFile, string verbName)
 		{
 			Basic.Enabled = Fancy.Enabled = mode == OutputMode.Fancy;
 
+			var logTarget = InitLogTarget(mode, logFile);
+
+			if (logTarget.TargetCount > 0)
+			{
+				Logger = new LogfmtLogger(logTarget, level, new { verb = verbName });
+			}
+		}
+
+		public static void Dispose()
+		{
+			_fileLogTarget?.Dispose();
+		}
+
+		private static MultiLogTarget InitLogTarget(OutputMode mode, string logFile)
+		{
+			var logTarget = new MultiLogTarget();
+
 			if (mode == OutputMode.Logfmt)
 			{
-				Logger = new LogfmtLogger(new TextWriterLogTarget(Console.Out), level, new { verb = verbName });
+				logTarget.AddTarget(new TextWriterLogTarget(Console.Out));
 			}
+
+			if (!string.IsNullOrWhiteSpace(logFile))
+			{
+				_fileLogTarget = new FileLogTarget(logFile);
+				logTarget.AddTarget(_fileLogTarget);
+			}
+
+			return logTarget;
 		}
 	}
 }

@@ -4,8 +4,11 @@ namespace Blent.Utility.Logging
 {
 	public class TextWriterLogTarget : ILogTarget
 	{
-		private TextWriter _writer;
+		protected readonly TextWriter _writer;
 
+		/// <summary>
+		/// Write lifetime is controlled by the caller.
+		/// </summary>
 		public TextWriterLogTarget(TextWriter writer)
 		{
 			_writer = writer;

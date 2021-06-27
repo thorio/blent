@@ -16,5 +16,6 @@ namespace Blent.Verb
 		string AppDirectory { get; set; }
 		LogLevel LogLevel { get; set; }
 		OutputMode OutputMode { get; set; }
+		string LogFile { get; set; }
 	}
 }

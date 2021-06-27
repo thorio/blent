@@ -17,5 +17,7 @@ namespace Blent.Verb
 		[Option("output-mode", Default = OutputMode.Fancy, HelpText = "Set the output mode.")]
 		public OutputMode OutputMode { get; set; }
 
+		[Option("log-file", Default = null, HelpText = "Set the logfile path.")]
+		public string LogFile { get; set; }
 	}
 }
