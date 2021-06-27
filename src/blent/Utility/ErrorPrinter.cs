@@ -1,3 +1,4 @@
+using Blent.Interop;
 using Blent.Utility.Drawing;
 using Blent.Utility.Logging;
 using System;
@@ -51,6 +52,15 @@ namespace Blent.Utility
 					Output.Fancy.WriteLine(FormatException(innerException, false));
 				}
 			}
+		}
+
+		public static void SubProcessError(string message, string name, ProcessResult result)
+		{
+			Output.Fancy.Write("SUBPROCESS ERROR: ", Color.Danger);
+			Output.Fancy.WriteLine(message);
+
+			Output.Fancy.WriteLine($"{name} exited with {result.ExitCode}:", Color.Info);
+			Output.Fancy.WriteLine(result.Error);
 		}
 
 		private static string FormatException(Exception ex, bool showStackTrace = true)

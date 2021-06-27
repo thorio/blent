@@ -30,7 +30,7 @@ namespace Blent.Startup
 			if (!supportedPlatforms.Contains(platform))
 			{
 				logger.Warn("the current platform is not supported, proceed with caution", new { platform });
-				ErrorPrinter.Warn($"The current platform [{platform}] is not supported, proceed with caution.");
+				ErrorPrinter.Warn($"The current platform ({platform}) is not supported, proceed with caution.");
 			}
 
 			PerformanceTesting.Checkpoint("End Platform Check");

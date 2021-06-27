@@ -7,16 +7,16 @@ namespace Blent.Interop
 	{
 		private const string Command = "docker-compose";
 
-		public static ProcessResults RunIn(string workingDirectory, string arguments, bool printOutput) =>
+		public static ProcessResult RunIn(string workingDirectory, string arguments, bool printOutput) =>
 			Process.Run(Command, arguments, workingDirectory, printOutput, printOutput);
 
-		public static ProcessResults Run(string stack, string arguments, bool printOutput)
+		public static ProcessResult Run(string stack, string arguments, bool printOutput)
 		{
 			if (!AppDirectory.StackExists(stack))
 			{
 				Output.Logger.Error("stack not found", new { stack });
 				ErrorPrinter.Error($"Stack '{stack}' not found.");
-				return new ProcessResults(1);
+				return new ProcessResult(1);
 			}
 
 			return RunIn(AppDirectory.GetStackDirectory(stack), arguments, printOutput);
@@ -30,7 +30,7 @@ namespace Blent.Interop
 			}
 		}
 
-		public static ProcessResults Up(string stack, string extraArguments = "", bool detached = true, bool forceRecreate = false, bool printOutput = true)
+		public static ProcessResult Up(string stack, string extraArguments = "", bool detached = true, bool forceRecreate = false, bool printOutput = true)
 		{
 			var arguments = $"up ";
 			if (detached) arguments += "-d ";
@@ -38,7 +38,7 @@ namespace Blent.Interop
 			return Run(stack, arguments + extraArguments, printOutput);
 		}
 
-		public static ProcessResults Down(string stack, string extraArguments = "", bool removeOrphans = false, bool printOutput = true)
+		public static ProcessResult Down(string stack, string extraArguments = "", bool removeOrphans = false, bool printOutput = true)
 		{
 			var arguments = $"down ";
 			if (removeOrphans) arguments += "--remove-orphans ";
@@ -54,7 +54,7 @@ namespace Blent.Interop
 			Run(stack, arguments, true);
 		}
 
-		public static ProcessResults Pull(string stack) =>
+		public static ProcessResult Pull(string stack) =>
 			Run(stack, "pull", false);
 
 		public static void Exec(string stack, string service, string command, int serviceIndex = 1, string extraArguments = "")

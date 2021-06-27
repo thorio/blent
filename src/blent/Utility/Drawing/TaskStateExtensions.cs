@@ -10,6 +10,7 @@ namespace Blent.Utility.Drawing
 				TaskState.Pending => new TableCell("...", Color.Default),
 				TaskState.Success => new TableCell("done", Color.Success),
 				TaskState.Failure => new TableCell("error", Color.Danger),
+				TaskState.NotStarted => new TableCell("", Color.Default),
 				_ => throw new ArgumentException("Unhandled enum value")
 			};
 		}

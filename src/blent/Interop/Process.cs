@@ -8,12 +8,12 @@ namespace Blent.Interop
 {
 	public static class Process
 	{
-		public static ProcessResults Run(string command, string arguments, string workingDirectory, bool printOutput, bool printErrors)
+		public static ProcessResult Run(string command, string arguments, string workingDirectory, bool printOutput, bool printErrors)
 		{
 			try
 			{
 				Output.Logger.Debug("starting child process", new { command, arguments, workingDirectory });
-				PerformanceTesting.Checkpoint($"Begin Process [{command} {arguments.Split(' ').First()}]");
+				PerformanceTesting.Checkpoint($"Begin Process {command} {arguments.Split(' ').First()}");
 
 				var process = System.Diagnostics.Process.Start(new ProcessStartInfo()
 				{
@@ -31,7 +31,7 @@ namespace Blent.Interop
 				Output.Logger.Trace("end child process", new { command, arguments, workingDirectory, process_stdout = output, process_stderr = error });
 
 				PerformanceTesting.Checkpoint($"End Process {command}");
-				return new ProcessResults(process.ExitCode, output, error);
+				return new ProcessResult(process.ExitCode, output, error);
 			}
 			catch (Win32Exception ex)
 			{

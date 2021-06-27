@@ -1,8 +1,8 @@
 namespace Blent.Interop
 {
-	public class ProcessResults
+	public class ProcessResult
 	{
-		public ProcessResults(int exitCode, string output = null, string error = null)
+		public ProcessResult(int exitCode, string output = null, string error = null)
 		{
 			ExitCode = exitCode;
 			Output = output;

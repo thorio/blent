@@ -71,7 +71,7 @@ namespace Blent.Verb.Backup
 				_encounteredError = true;
 				progress.Report(TaskState.Failure);
 
-				ErrorPrinter.HandledException($"Writing archive of stack [{stack}] failed", ex);
+				ErrorPrinter.HandledException($"Writing archive of stack {stack} failed", ex);
 				logger.Error("writing archive failed", ex, new { stack, source = stackDirectory, target = archivePath });
 			}
 		}

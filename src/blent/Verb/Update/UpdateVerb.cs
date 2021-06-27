@@ -42,32 +42,48 @@ namespace Blent.Verb.Update
 		{
 			logger.Trace("pulling stack", new { stack });
 
-			var pullResults = DockerCompose.Pull(stack);
-			var pullSuccess = pullResults.ExitCode == 0;
-			progress.Report((pullSuccess.ToTaskState(), TaskState.Pending));
-
-			if (!pullSuccess)
-			{
-				logger.Error("pulling stack failed", new { stack });
-				logger.Debug("pulling stack failed", new { stack, compose_stdout = pullResults.Output, compose_stderr = pullResults.Error });
-				return;
-			}
+			if (!PullStack(stack, progress, options, logger)) return;
 
 			logger.Info("pulled stack", new { stack });
-			logger.Trace("recreating stack", new { stack });
+			logger.Trace("restarting stack", new { stack });
 
-			var upResults = DockerCompose.Up(stack, printOutput: false);
-			var upSuccess = upResults.ExitCode == 0;
-			progress.Report((TaskState.Success, upSuccess.ToTaskState()));
+			RestartStack(stack, progress, options, logger);
 
-			if (!upSuccess)
+			logger.Info("restarted stack", new { stack });
+		}
+
+		private bool PullStack(string stack, IProgress<(TaskState, TaskState)> progress, UpdateOptions options, ILogger logger)
+		{
+			var result = DockerCompose.Pull(stack);
+			var success = result.ExitCode == 0;
+			progress.Report((success.ToTaskState(), success.ToSuccessiveTaskState()));
+
+			if (!success)
 			{
-				logger.Error("recreating stack failed", new { stack });
-				logger.Debug("recreating stack failed", new { stack, compose_stdout = upResults.Output, compose_stderr = upResults.Error });
-				return;
+				logger.Error("pulling stack failed", new { stack });
+				logger.Debug("pulling stack failed", new { stack, compose_stdout = result.Output, compose_stderr = result.Error });
+
+				ErrorPrinter.SubProcessError($"Pulling stack {stack} failed.", "docker-compose pull", result);
+				return false;
 			}
 
-			logger.Info("recreated stack", new { stack });
+			return true;
+		}
+
+		private void RestartStack(string stack, IProgress<(TaskState, TaskState)> progress, UpdateOptions options, ILogger logger)
+		{
+			var result = DockerCompose.Up(stack, printOutput: false);
+			var success = result.ExitCode == 0;
+			progress.Report((TaskState.Success, success.ToTaskState()));
+
+			if (!success)
+			{
+				logger.Error("restarting stack failed", new { stack });
+				logger.Debug("restarting stack failed", new { stack, compose_stdout = result.Output, compose_stderr = result.Error });
+
+				ErrorPrinter.SubProcessError($"Recreating stack {stack} failed.", "docker-compose up", result);
+				return;
+			}
 		}
 
 		private void HandleProgress((TaskState pullState, TaskState upState) report, TableRow row)

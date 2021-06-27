@@ -11,7 +11,7 @@ namespace Blent.Interop
 		public const string Command = "docker";
 		public const string ComDockerComposeProject = "com.docker.compose.project";
 
-		public static ProcessResults Run(string arguments, bool printOutput = false, bool printErrors = true) =>
+		public static ProcessResult Run(string arguments, bool printOutput = false, bool printErrors = true) =>
 			Process.Run(Command, arguments, null, printOutput, printErrors);
 
 		public static bool IsRunning()
@@ -27,7 +27,7 @@ namespace Blent.Interop
 			}
 		}
 
-		public static ProcessResults Inspect(IEnumerable<string> containers, string format = null, string additionalArguments = "")
+		public static ProcessResult Inspect(IEnumerable<string> containers, string format = null, string additionalArguments = "")
 		{
 			var arguments = $"inspect {string.Join(' ', containers)} {additionalArguments}";
 

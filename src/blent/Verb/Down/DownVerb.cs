@@ -36,8 +36,8 @@ namespace Blent.Verb.Down
 		{
 			logger.Trace("stopping stack", new { stack });
 
-			var results = DockerCompose.Down(stack, options.PassthroughArguments, options.RemoveOrphans, false);
-			if (results.ExitCode == 0)
+			var result = DockerCompose.Down(stack, options.PassthroughArguments, options.RemoveOrphans, false);
+			if (result.ExitCode == 0)
 			{
 				logger.Info("stopped stack", new { stack });
 				progress.Report(TaskState.Success);
@@ -45,7 +45,9 @@ namespace Blent.Verb.Down
 			else
 			{
 				logger.Error("stopping stack failed", new { stack });
-				logger.Debug("stopping stack failed", new { stack, compose_stdout = results.Output, compose_stderr = results.Error });
+				logger.Debug("stopping stack failed", new { stack, compose_stdout = result.Output, compose_stderr = result.Error });
+
+				ErrorPrinter.SubProcessError($"Stopping stack {stack} failed.", "docker-compose down", result);
 				progress.Report(TaskState.Failure);
 			}
 		}

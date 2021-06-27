@@ -36,8 +36,8 @@ namespace Blent.Verb.Up
 		{
 			logger.Trace("starting stack", new { stack });
 
-			var results = DockerCompose.Up(stack, options.PassthroughArguments, !options.Attach, options.ForceRecreate, false);
-			if (results.ExitCode == 0)
+			var result = DockerCompose.Up(stack, options.PassthroughArguments, !options.Attach, options.ForceRecreate, false);
+			if (result.ExitCode == 0)
 			{
 				logger.Info("started stack", new { stack });
 				progress.Report(TaskState.Success);
@@ -45,7 +45,9 @@ namespace Blent.Verb.Up
 			else
 			{
 				logger.Error("starting stack failed", new { stack });
-				logger.Debug("starting stack failed", new { stack, compose_stdout = results.Output, compose_stderr = results.Error });
+				logger.Debug("starting stack failed", new { stack, compose_stdout = result.Output, compose_stderr = result.Error });
+
+				ErrorPrinter.SubProcessError($"Starting stack {stack} failed.", "docker-compose up", result);
 				progress.Report(TaskState.Failure);
 			}
 		}
