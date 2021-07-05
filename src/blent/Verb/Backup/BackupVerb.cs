@@ -1,3 +1,4 @@
+using Blent.Configuration;
 using Blent.Interop;
 using Blent.Utility;
 using Blent.Utility.Drawing;
@@ -37,7 +38,7 @@ namespace Blent.Verb.Backup
 
 			new ParallelTaskManager<string, TaskState>(stacks, GetRow, (stack, progress) => Execute(logger, stack, progress, options), HandleProgress,
 				new[] { 0, 5 })
-				.Execute();
+				.Execute(Settings.UserConfig.Parallelism);
 
 			if (_encounteredError)
 			{

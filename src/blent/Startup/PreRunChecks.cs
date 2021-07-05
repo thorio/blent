@@ -13,10 +13,9 @@ namespace Blent.Startup
 	{
 		public static void PerformChecks(ILogger logger, IVerb verb, UserConfig config)
 		{
-			PerformanceTesting.Checkpoint("Begin Checks");
-
 			CheckPlatform(logger);
 			CheckAppDirectory(logger);
+			CheckParallelism(logger, config);
 			CheckDocker(logger, verb, config);
 		}
 
@@ -32,8 +31,6 @@ namespace Blent.Startup
 				logger.Warn("the current platform is not supported, proceed with caution", new { platform });
 				ErrorPrinter.Warn($"The current platform ({platform}) is not supported, proceed with caution.");
 			}
-
-			PerformanceTesting.Checkpoint("End Platform Check");
 		}
 
 		private static void CheckAppDirectory(ILogger logger)
@@ -46,12 +43,22 @@ namespace Blent.Startup
 				logger.Fatal("app directory does not exist", new { path });
 				throw new FatalException($"App directory [{path}] does not exist");
 			};
+		}
 
-			PerformanceTesting.Checkpoint("End App Directory Check");
+		private static void CheckParallelism(ILogger logger, UserConfig config)
+		{
+			logger.Trace("checking parallelism");
+
+			if (config.Parallelism <= 0)
+			{
+				logger.Fatal("parallelism failed", new { parallelism = config.Parallelism });
+				throw new FatalException("Parallelism cannot be less than 1.");
+			}
 		}
 
 		private static void CheckDocker(ILogger logger, IVerb verb, UserConfig config)
 		{
+			PerformanceTesting.Checkpoint("Begin Docker Check");
 			logger.Trace("checking docker");
 
 			if (verb.RequiresDocker && config.Checks.Docker && !Docker.IsRunning())

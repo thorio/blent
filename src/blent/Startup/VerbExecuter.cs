@@ -58,6 +58,12 @@ namespace Blent.Startup
 				logger.Trace("setting app directory from commandline", new { app_directory = options.AppDirectory });
 				config.AppDirectory = options.AppDirectory;
 			}
+
+			if (options.Parallelism.HasValue)
+			{
+				logger.Trace("setting parallelism from commandline", new { parallelism = options.Parallelism });
+				config.Parallelism = options.Parallelism.Value;
+			}
 		}
 	}
 }

@@ -1,4 +1,11 @@
+# This is where your stacks are located.
 appDirectory: ~/app
 
+# Maximum degree of parallelism.
+# This changes how many Actions are executed at the same time.
+parallelism: 5
+
+# Time intensive checks can be skipped.
+# Set a check to false to skip it.
 checks:
   docker: true

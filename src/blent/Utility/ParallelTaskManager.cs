@@ -2,6 +2,7 @@ using Blent.Utility.Drawing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Blent.Utility
@@ -23,15 +24,24 @@ namespace Blent.Utility
 			_progressHandler = progressHandler;
 		}
 
-		public void Execute()
+		public void Execute(int maxDegreeOfParallelism)
 		{
+			var semaphore = new SemaphoreSlim(maxDegreeOfParallelism);
 			var tableRenderer = new TableRenderer(_table, Output.Fancy);
 
 			Parallel.ForEach(_parameters, (parameter, state, index) =>
 			{
-				var progress = new CustomProgress<TReport>((report) => _progressHandler(report, _table.GetRow((int)index)));
+				try
+				{
+					semaphore.Wait();
+					var progress = new CustomProgress<TReport>((report) => _progressHandler(report, _table.GetRow((int)index)));
 
-				_executor(parameter, progress);
+					_executor(parameter, progress);
+				}
+				finally
+				{
+					semaphore.Release();
+				}
 			});
 
 			tableRenderer.Dispose();

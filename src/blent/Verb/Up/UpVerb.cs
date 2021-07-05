@@ -1,3 +1,4 @@
+using Blent.Configuration;
 using Blent.Interop;
 using Blent.Utility;
 using Blent.Utility.Drawing;
@@ -26,7 +27,7 @@ namespace Blent.Verb.Up
 			logger.Trace("starting stacks in parallel", new { stack_count = stacks.Count(), stacks = string.Join(",", stacks) });
 
 			new ParallelTaskManager<string, TaskState>(stacks, GetRow, (stack, progress) => Execute(stack, progress, options, logger), HandleProgress, new[] { 0, 5 })
-				.Execute();
+				.Execute(Settings.UserConfig.Parallelism);
 		}
 
 		private IEnumerable<string> GetRow(string stack) =>

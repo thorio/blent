@@ -17,5 +17,6 @@ namespace Blent.Verb
 		LogLevel LogLevel { get; set; }
 		OutputMode OutputMode { get; set; }
 		string LogFile { get; set; }
+		int? Parallelism { get; set; }
 	}
 }

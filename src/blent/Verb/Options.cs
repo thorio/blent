@@ -19,5 +19,8 @@ namespace Blent.Verb
 
 		[Option("log-file", Default = null, HelpText = "Set the logfile path.")]
 		public string LogFile { get; set; }
+
+		[Option("max-parallelism", HelpText = "Set the maximum degree of parallelism. Set to 1 to disable.")]
+		public int? Parallelism { get; set; }
 	}
 }

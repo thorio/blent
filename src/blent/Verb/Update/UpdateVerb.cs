@@ -1,3 +1,4 @@
+using Blent.Configuration;
 using Blent.Interop;
 using Blent.Utility;
 using Blent.Utility.Drawing;
@@ -27,7 +28,7 @@ namespace Blent.Verb.Update
 
 			new ParallelTaskManager<string, (TaskState, TaskState)>(stacks, GetRow, (stack, progress) => Execute(stack, progress, options, logger), HandleProgress,
 				new[] { 0, 5, 0 }, new[] { "Stack", "Pull", "Restart" })
-				.Execute();
+				.Execute(Settings.UserConfig.Parallelism);
 
 			if (options.RemoveDanglingImages)
 			{
