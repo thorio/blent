@@ -5,7 +5,7 @@ fn main() {
 
 	let args = cli::parse();
 
-	init_log(args.verbosity.log_level());
+	init_log(args.verbosity.log_level_filter());
 	run();
 
 	log::trace!("exiting");
