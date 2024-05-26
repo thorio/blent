@@ -8,11 +8,13 @@ authors = ["thorou"]
 repository = "https://github.com/thorio/blent"
 
 [dependencies]
+anyhow = "1.0.86"
+bollard = "0.16.1"
 clap = { version = "4.5.4", features = ["derive"] }
 clap-verbosity-flag = "2.2.0"
 color-eyre = "0.6.3"
 log = "0.4.21"
-stderrlog = { version = "0.6.0", default-features = false }
+tokio = { version = "1.37.0", features = ["macros"] }
 
 [profile.release]
 strip = true
