@@ -1,0 +1,7 @@
+Package: blent
+Architecture: amd64
+Version: 0.0.0-dev
+Maintainer: thorou <thorou@chirality.de>
+Section: x11
+Priority: extra
+Description: Cross-platform application launcher for Linux and Windows

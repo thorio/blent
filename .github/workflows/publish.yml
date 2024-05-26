@@ -1,0 +1,26 @@
+name: publish
+
+on:
+  push:
+    tags: [ 'v*' ]
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: build and package
+        run: cargo make deb
+
+      - name: upload packages
+        uses: svenstaro/upload-release-action@v2
+        with:
+          file_glob: true
+          file: target/artifacts/*

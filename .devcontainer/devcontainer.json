@@ -1,0 +1,13 @@
+{
+	"name": "blent",
+	"image": "mcr.microsoft.com/devcontainers/rust:1-bookworm",
+	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": ["shardulm94.trailing-spaces"]
+		}
+	},
+	"onCreateCommand": "cargo install --debug cargo-make"
+}

@@ -1,0 +1,22 @@
+[package]
+name = "blent"
+version = "0.0.0-dev"
+edition = "2021"
+description = "CLI for managing multiple docker-compose projects"
+license = "GPL-3"
+authors = ["thorou"]
+repository = "https://github.com/thorio/blent"
+
+[dependencies]
+clap = { version = "4.5.4", features = ["derive"] }
+color-eyre = "0.6.3"
+log = "0.4.21"
+stderrlog = { version = "0.6.0", default-features = false }
+
+[profile.release]
+strip = true
+lto = true
+
+# improve debug backtrace performance with color-eyre
+[profile.dev.package.backtrace]
+opt-level = 3

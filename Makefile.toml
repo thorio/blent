@@ -1,0 +1,21 @@
+# NOTE: grep is super old on github actions windows-2022 so don't use it without LC_ALL=en_US.utf8
+[tasks.patch-version]
+script_runner = "sh"
+script = '''
+	sha=$(git rev-parse --short HEAD)
+	tag=$(git describe --tags --abbrev=0 --match 'v*' | sed 's/^v//')
+	sed -i "s/0.0.0-dev/$tag+$sha/" Cargo.toml
+	sed -i "s/0.0.0-dev/$tag/" package/debian/control
+'''
+
+[tasks.artifact-dropoff]
+script_runner = "sh"
+script = "mkdir -p target/artifacts"
+
+[tasks.deb]
+dependencies = ["artifact-dropoff", "patch-version"]
+script = '''
+	cargo build --release
+	bash package/build.sh
+	mv package/*.deb target/artifacts/blent-x86_64.deb
+'''
