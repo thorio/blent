@@ -1,4 +1,4 @@
-use crate::cli::GlobalArgs;
+use crate::{cli::GlobalArgs, filter::ServiceDesignator};
 use bollard::{container::ListContainersOptions, errors::Error as BollardError, secret::ContainerSummary};
 use itertools::Itertools;
 
@@ -17,7 +17,7 @@ pub struct Docker {
 }
 
 impl Docker {
-	pub async fn services(&self) -> Result<Vec<Service>, BollardError> {
+	pub async fn services(&self) -> Result<impl Iterator<Item = Service>, BollardError> {
 		let options = ListContainersOptions::<String> {
 			all: true,
 			..Default::default()
@@ -30,15 +30,13 @@ impl Docker {
 			.into_iter()
 			.filter_map(get_service)
 			.sorted()
-			.dedup()
-			.collect_vec();
+			.dedup();
 
 		Ok(services)
 	}
 }
 
 fn get_service(container: ContainerSummary) -> Option<Service> {
-	dbg!(&container);
 	let mut labels = container.labels?;
 
 	Some(Service {
@@ -55,6 +53,16 @@ pub struct Service {
 	pub stack: String,
 	pub status: String,
 	pub running: bool,
+}
+
+impl ServiceDesignator for Service {
+	fn stack(&'_ self) -> &'_ str {
+		&self.stack
+	}
+
+	fn service(&'_ self) -> &'_ str {
+		&self.name
+	}
 }
 
 impl PartialEq for Service {

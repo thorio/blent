@@ -6,6 +6,7 @@ use std::process::ExitCode;
 mod cli;
 mod commands;
 mod docker;
+mod filter;
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> ExitCode {
