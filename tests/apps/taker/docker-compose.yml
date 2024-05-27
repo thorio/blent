@@ -1,0 +1,40 @@
+services:
+  pandemonica:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  modeus:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  cerberus:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  malina:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  zdrada:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  azazel:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  justice:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  lucifer:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  judgement:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  beelzebub:
+    image: traefik/whoami
+    restart: unless-stopped

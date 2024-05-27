@@ -1,0 +1,24 @@
+services:
+  chert:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  esker:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  feldspar:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  gabbro:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  riebeck:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  solanum:
+    image: traefik/whoami
+    restart: unless-stopped

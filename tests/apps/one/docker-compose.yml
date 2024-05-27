@@ -1,0 +1,32 @@
+services:
+  alula:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  calamus:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  cedric:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  kip:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  maize:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  niko:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  rue:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  silver:
+    image: traefik/whoami
+    restart: unless-stopped

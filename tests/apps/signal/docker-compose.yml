@@ -1,0 +1,37 @@
+services:
+  adler:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  ara:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  elster:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  eule:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  falke:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  kolibri:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  mynah:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  star:
+    image: traefik/whoami
+    restart: unless-stopped
+
+  storch:
+    image: traefik/whoami
+    restart: unless-stopped
+
