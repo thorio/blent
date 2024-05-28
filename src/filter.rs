@@ -1,35 +1,58 @@
 use anyhow::{anyhow, bail};
+use itertools::Itertools;
 use std::str::FromStr;
+
+const ARG_SEPARATOR: char = ':';
 
 pub trait IteratorExt: Iterator {
 	fn filter_services(self, filters: &[impl FilterService]) -> impl Iterator<Item = Self::Item>
 	where
 		Self: Sized,
-		Self::Item: ServiceDesignator,
+		Self::Item: IdentifyService,
 	{
 		self.filter(|s| filters.iter().any(|f| f.filter(s)))
+	}
+
+	fn aggregate_services(self) -> impl Iterator<Item = StackDescriptor>
+	where
+		Self: Sized,
+		Self::Item: IdentifyService + Ord,
+	{
+		self.sorted()
+			.into_grouping_map_by(|s| s.stack().to_owned())
+			.fold_with(
+				|stack, _v| StackDescriptor {
+					stack: stack.to_owned(),
+					services: vec![],
+				},
+				|mut acc, _k, v| {
+					acc.services.push(v.service().to_owned());
+					acc
+				},
+			)
+			.into_values()
 	}
 }
 
 impl<T: Iterator> IteratorExt for T {}
 
 pub trait FilterService {
-	fn filter(&self, service: &impl ServiceDesignator) -> bool;
+	fn filter(&self, service: &impl IdentifyService) -> bool;
 }
 
-pub trait ServiceDesignator {
+pub trait IdentifyService {
 	fn stack(&'_ self) -> &'_ str;
 	fn service(&'_ self) -> &'_ str;
 }
 
 #[derive(Debug, Clone)]
 pub struct ServiceFilter {
-	stack: String,
-	service: Option<String>,
+	pub stack: String,
+	pub service: Option<String>,
 }
 
 impl FilterService for ServiceFilter {
-	fn filter(&self, service: &impl ServiceDesignator) -> bool {
+	fn filter(&self, service: &impl IdentifyService) -> bool {
 		self.stack == service.stack()
 			&& (self.service.is_none() || self.service.as_ref().is_some_and(|s| s == service.service()))
 	}
@@ -39,7 +62,7 @@ impl FromStr for ServiceFilter {
 	type Err = anyhow::Error;
 
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
-		let mut split = s.split(':');
+		let mut split = s.split(ARG_SEPARATOR);
 		let stack = split.next().expect("split always returns at least one item").trim();
 		let service = split.next().map(|s| s.trim());
 
@@ -48,7 +71,7 @@ impl FromStr for ServiceFilter {
 		}
 
 		if service.is_some_and(|s| s.is_empty()) {
-			bail!("trailing : is not allowed")
+			bail!("trailing '{ARG_SEPARATOR}' is not allowed")
 		}
 
 		if let Some(third) = split.next() {
@@ -56,25 +79,25 @@ impl FromStr for ServiceFilter {
 		}
 
 		Ok(Self {
-			stack: stack.to_string(),
-			service: service.map(str::to_string),
+			stack: stack.to_owned(),
+			service: service.map(str::to_owned),
 		})
 	}
 }
 
 #[derive(Debug, Clone)]
-pub struct ServiceSpecifier {
-	stack: String,
-	service: String,
+pub struct ServiceDescriptor {
+	pub stack: String,
+	pub service: String,
 }
 
-impl FilterService for ServiceSpecifier {
-	fn filter(&self, service: &impl ServiceDesignator) -> bool {
+impl FilterService for ServiceDescriptor {
+	fn filter(&self, service: &impl IdentifyService) -> bool {
 		self.stack == service.stack() && self.service == service.service()
 	}
 }
 
-impl ServiceDesignator for ServiceSpecifier {
+impl IdentifyService for ServiceDescriptor {
 	fn stack(&'_ self) -> &'_ str {
 		&self.stack
 	}
@@ -84,7 +107,7 @@ impl ServiceDesignator for ServiceSpecifier {
 	}
 }
 
-impl FromStr for ServiceSpecifier {
+impl FromStr for ServiceDescriptor {
 	type Err = anyhow::Error;
 
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -95,4 +118,10 @@ impl FromStr for ServiceSpecifier {
 			service: filter.service.ok_or(anyhow!("no service specified"))?,
 		})
 	}
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct StackDescriptor {
+	stack: String,
+	services: Vec<String>,
 }

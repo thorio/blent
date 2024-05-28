@@ -1,4 +1,4 @@
-use crate::{cli::GlobalArgs, filter::ServiceDesignator};
+use crate::{cli::GlobalArgs, filter::IdentifyService};
 use bollard::{container::ListContainersOptions, errors::Error as BollardError, secret::ContainerSummary};
 use itertools::Itertools;
 
@@ -55,7 +55,7 @@ pub struct Service {
 	pub running: bool,
 }
 
-impl ServiceDesignator for Service {
+impl IdentifyService for Service {
 	fn stack(&'_ self) -> &'_ str {
 		&self.stack
 	}
