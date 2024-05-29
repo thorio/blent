@@ -7,6 +7,7 @@ mod cli;
 mod commands;
 mod docker;
 mod filter;
+mod iterext;
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> ExitCode {

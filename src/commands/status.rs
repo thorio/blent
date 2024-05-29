@@ -1,9 +1,8 @@
 use crate::cli::GlobalArgs;
 use crate::docker;
-use crate::filter::IteratorExt;
-use crate::filter::ServiceFilter;
+use crate::filter::{FilterIterExt, ServiceFilter};
+use crate::iterext::IteratorExt;
 use anyhow::Result;
-use itertools::Itertools;
 use std::process::ExitCode;
 
 /// Print a summary of stacks
@@ -18,16 +17,11 @@ pub async fn exec(global_args: GlobalArgs, args: Args) -> Result<ExitCode> {
 	let services = docker
 		.services()
 		.await?
-		.filter_services(&args.filter)
-		.aggregate_services()
-		.sorted()
-		.collect_vec();
+		.when(!args.filter.is_empty(), |i| i.filter_services(&args.filter));
 
-	dbg!(services);
-
-	// for service in services {
-	// 	println!("{}: {} ({})", service.stack, service.name, service.status)
-	// }
+	for service in services {
+		println!("{}: {} ({})", service.stack, service.name, service.status)
+	}
 
 	Ok(ExitCode::SUCCESS)
 }

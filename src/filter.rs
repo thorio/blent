@@ -4,7 +4,7 @@ use std::str::FromStr;
 
 const ARG_SEPARATOR: char = ':';
 
-pub trait IteratorExt: Iterator {
+pub trait FilterIterExt: Iterator {
 	fn filter_services(self, filters: &[impl FilterService]) -> impl Iterator<Item = Self::Item>
 	where
 		Self: Sized,
@@ -18,23 +18,16 @@ pub trait IteratorExt: Iterator {
 		Self: Sized,
 		Self::Item: IdentifyService + Ord,
 	{
-		self.sorted()
-			.into_grouping_map_by(|s| s.stack().to_owned())
-			.fold_with(
-				|stack, _v| StackDescriptor {
-					stack: stack.to_owned(),
-					services: vec![],
-				},
-				|mut acc, _k, v| {
-					acc.services.push(v.service().to_owned());
-					acc
-				},
-			)
-			.into_values()
+		self.into_group_map_by(|s| s.stack().to_owned())
+			.into_iter()
+			.map(|(k, v)| StackDescriptor {
+				stack: k,
+				services: v.into_iter().map(|v| v.service().to_owned()).collect_vec(),
+			})
 	}
 }
 
-impl<T: Iterator> IteratorExt for T {}
+impl<T: Iterator> FilterIterExt for T {}
 
 pub trait FilterService {
 	fn filter(&self, service: &impl IdentifyService) -> bool;
