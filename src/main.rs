@@ -5,9 +5,11 @@ use std::process::ExitCode;
 
 mod cli;
 mod commands;
+mod compose;
 mod docker;
 mod eitherext;
 mod filter;
+mod paths;
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> ExitCode {
@@ -20,7 +22,7 @@ async fn main() -> ExitCode {
 	match run_command(args).await {
 		Ok(code) => code,
 		Err(err) => {
-			log::error!("{}", err);
+			println!("ERROR: {err}");
 			ExitCode::FAILURE
 		}
 	}

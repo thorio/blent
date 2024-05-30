@@ -1,4 +1,5 @@
 use crate::{cli::GlobalArgs, filter::IdentifyService};
+use anyhow::anyhow;
 use bollard::{container::ListContainersOptions, errors::Error as BollardError, secret::ContainerSummary};
 use itertools::Itertools;
 
@@ -6,17 +7,17 @@ const COMPOSE_PROJECT_LABEL: &str = "com.docker.compose.project";
 const COMPOSE_SERVICE_LABEL: &str = "com.docker.compose.service";
 const DOCKER_STATE_RUNNING: &str = "running";
 
-pub fn connect(_args: &GlobalArgs) -> Result<Docker, BollardError> {
-	let bollard = bollard::Docker::connect_with_defaults()?;
-
-	Ok(Docker { bollard })
-}
-
 pub struct Docker {
 	bollard: bollard::Docker,
 }
 
 impl Docker {
+	pub fn connect(_args: &GlobalArgs) -> Result<Docker, BollardError> {
+		let bollard = bollard::Docker::connect_with_defaults()?;
+
+		Ok(Docker { bollard })
+	}
+
 	pub async fn services(&self) -> Result<impl Iterator<Item = Service>, BollardError> {
 		let options = ListContainersOptions::<String> {
 			all: true,
@@ -28,23 +29,13 @@ impl Docker {
 			.list_containers(Some(options))
 			.await?
 			.into_iter()
-			.filter_map(get_service)
+			.map(TryInto::try_into)
+			.filter_map(Result::ok)
 			.sorted()
 			.dedup();
 
 		Ok(services)
 	}
-}
-
-fn get_service(container: ContainerSummary) -> Option<Service> {
-	let mut labels = container.labels?;
-
-	Some(Service {
-		name: labels.remove(COMPOSE_SERVICE_LABEL)?,
-		stack: labels.remove(COMPOSE_PROJECT_LABEL)?,
-		status: container.status?,
-		running: container.state? == DOCKER_STATE_RUNNING,
-	})
 }
 
 #[derive(Debug)]
@@ -53,6 +44,33 @@ pub struct Service {
 	pub stack: String,
 	pub status: String,
 	pub running: bool,
+}
+
+impl TryFrom<ContainerSummary> for Service {
+	type Error = anyhow::Error;
+
+	fn try_from(value: ContainerSummary) -> Result<Self, Self::Error> {
+		let mut labels = value.labels.ok_or(anyhow!("no labels"))?;
+
+		let name = labels
+			.remove(COMPOSE_SERVICE_LABEL)
+			.ok_or(anyhow!("no service label"))?;
+
+		let stack = labels
+			.remove(COMPOSE_PROJECT_LABEL)
+			.ok_or(anyhow!("no project label"))?;
+
+		let status = value.status.ok_or(anyhow!("no status"))?;
+
+		let running = value.state.ok_or(anyhow!("no state"))? == DOCKER_STATE_RUNNING;
+
+		Ok(Service {
+			name,
+			stack,
+			status,
+			running,
+		})
+	}
 }
 
 impl IdentifyService for Service {

@@ -1,6 +1,7 @@
 use crate::commands;
 use clap::{Args, Parser, Subcommand};
 use clap_verbosity_flag::{Verbosity, WarnLevel};
+use std::path::PathBuf;
 
 pub fn parse() -> CliArgs {
 	CliArgs::parse()
@@ -22,7 +23,11 @@ pub struct CliArgs {
 }
 
 #[derive(Args, Debug)]
-pub struct GlobalArgs {}
+pub struct GlobalArgs {
+	/// Directory in which to look for stacks [default: ~/apps]
+	#[arg(long, value_name = "PATH", global = true)]
+	pub app_path: Option<PathBuf>,
+}
 
 #[derive(Subcommand, Debug)]
 pub enum Command {
