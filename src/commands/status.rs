@@ -1,7 +1,7 @@
 use crate::cli::GlobalArgs;
 use crate::docker;
-use crate::filter::{FilterIterExt, ServiceFilter};
-use crate::iterext::IteratorExt;
+use crate::eitherext::EitherExt;
+use crate::filter::{IterExt, ServiceFilter};
 use anyhow::Result;
 use std::process::ExitCode;
 
@@ -17,7 +17,7 @@ pub async fn exec(global_args: GlobalArgs, args: Args) -> Result<ExitCode> {
 	let services = docker
 		.services()
 		.await?
-		.when(!args.filter.is_empty(), |i| i.filter_services(&args.filter));
+		.either_left(!args.filter.is_empty(), |i| i.filter_services(&args.filter));
 
 	for service in services {
 		println!("{}: {} ({})", service.stack, service.name, service.status)

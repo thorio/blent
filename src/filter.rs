@@ -4,7 +4,7 @@ use std::str::FromStr;
 
 const ARG_SEPARATOR: char = ':';
 
-pub trait FilterIterExt: Iterator {
+pub trait IterExt: Iterator {
 	fn filter_services(self, filters: &[impl FilterService]) -> impl Iterator<Item = Self::Item>
 	where
 		Self: Sized,
@@ -22,12 +22,12 @@ pub trait FilterIterExt: Iterator {
 			.into_iter()
 			.map(|(k, v)| StackDescriptor {
 				stack: k,
-				services: v.into_iter().map(|v| v.service().to_owned()).collect_vec(),
+				services: v.into_iter().map(|v| v.into_service()).collect_vec(),
 			})
 	}
 }
 
-impl<T: Iterator> FilterIterExt for T {}
+impl<T: Iterator> IterExt for T {}
 
 pub trait FilterService {
 	fn filter(&self, service: &impl IdentifyService) -> bool;
@@ -36,6 +36,7 @@ pub trait FilterService {
 pub trait IdentifyService {
 	fn stack(&'_ self) -> &'_ str;
 	fn service(&'_ self) -> &'_ str;
+	fn into_service(self) -> String;
 }
 
 #[derive(Debug, Clone)]
@@ -97,6 +98,10 @@ impl IdentifyService for ServiceDescriptor {
 
 	fn service(&'_ self) -> &'_ str {
 		&self.service
+	}
+
+	fn into_service(self) -> String {
+		self.service
 	}
 }
 
