@@ -13,6 +13,7 @@ pub trait IterExt: Iterator {
 		self.filter(|s| filters.iter().any(|f| f.filter(s)))
 	}
 
+	#[allow(unused)] // will be used later
 	fn aggregate_services(self) -> impl Iterator<Item = StackDescriptor>
 	where
 		Self: Sized,

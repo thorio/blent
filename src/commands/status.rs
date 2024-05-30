@@ -26,7 +26,7 @@ pub async fn exec(global_args: GlobalArgs, args: Args) -> Result<ExitCode> {
 
 	let services = compose
 		.services()?
-		.either_left(!args.filter.is_empty(), |i| i.filter_services(&args.filter));
+		.either(!args.filter.is_empty(), |i| i.filter_services(&args.filter));
 
 	for service in services {
 		let docker_service = docker_service_map
