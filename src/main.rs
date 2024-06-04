@@ -5,7 +5,6 @@ use std::process::ExitCode;
 
 mod cli;
 mod commands;
-mod compose;
 mod docker;
 mod eitherext;
 mod filter;

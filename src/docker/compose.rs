@@ -1,6 +1,6 @@
+use super::compose_file::{self, ComposeFile};
 use crate::{cli::GlobalArgs, filter::IdentifyService, paths};
 use anyhow::{bail, Result};
-use docker_compose_types::{Compose as ComposeFile, Service as ComposeService};
 use std::{fs, path::PathBuf};
 
 const COMPOSE_FILE_NAME: &str = "docker-compose.yml";
@@ -25,10 +25,12 @@ impl Compose {
 	}
 
 	fn compose_files(&self) -> Result<impl Iterator<Item = (String, ComposeFile)>> {
-		Ok(fs::read_dir(&self.app_path)?
+		let services = fs::read_dir(&self.app_path)?
 			.filter_map(|e| e.map(|e| e.path()).ok())
 			.map(read_compose_file)
-			.filter_map(Result::ok))
+			.filter_map(Result::ok);
+
+		Ok(services)
 	}
 }
 
@@ -42,13 +44,13 @@ fn read_compose_file(mut path: PathBuf) -> Result<(String, ComposeFile)> {
 	path.push(COMPOSE_FILE_NAME);
 
 	let compose_file: ComposeFile = serde_yml::from_reader(fs::File::open(path)?)?;
+
 	Ok((stack, compose_file))
 }
 
 fn get_services((stack, compose_file): (String, ComposeFile)) -> impl Iterator<Item = Service> {
 	compose_file
 		.services
-		.0
 		.into_iter()
 		.map(move |(name, service)| Service::from_compose(stack.clone(), name, service))
 		.filter_map(Result::ok)
@@ -61,7 +63,7 @@ pub struct Service {
 }
 
 impl Service {
-	fn from_compose(stack: String, name: String, _service: Option<ComposeService>) -> Result<Service> {
+	fn from_compose(stack: String, name: String, _service: compose_file::Service) -> Result<Service> {
 		Ok(Service { stack, name })
 	}
 }
