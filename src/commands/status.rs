@@ -1,7 +1,7 @@
 use crate::cli::GlobalArgs;
 use crate::docker::compose::Compose;
 use crate::docker::daemon::Docker;
-use crate::ext::EitherExt;
+use crate::ext::IntoEither;
 use crate::filter::{IterExt, ServiceFilter};
 use anyhow::Result;
 use itertools::Itertools;
@@ -12,6 +12,10 @@ use std::process::ExitCode;
 #[derive(clap::Args, Debug)]
 pub struct Args {
 	filter: Vec<ServiceFilter>,
+
+	// Discard values after --
+	#[arg(last = true, hide = true)]
+	_discard: Vec<String>,
 }
 
 pub async fn exec(global_args: GlobalArgs, args: Args) -> Result<ExitCode> {

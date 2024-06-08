@@ -1,6 +1,6 @@
 use itertools::Either;
 
-pub trait EitherExt {
+pub trait IntoEither {
 	fn either<T>(self, is_left: bool, left: impl FnOnce(Self) -> T) -> Either<T, Self>
 	where
 		Self: Sized,
@@ -20,7 +20,7 @@ pub trait EitherExt {
 	}
 }
 
-impl<T> EitherExt for T {}
+impl<T> IntoEither for T {}
 
 pub trait IterExt {
 	/// Returns an iterator adapter with only the `Result::Ok` values,

@@ -32,6 +32,7 @@ async fn run_command(args: CliArgs) -> Result<ExitCode> {
 
 	match args.command {
 		cmd::Status(a) => commands::status::exec(args.global, a).await,
+		cmd::Up(a) => commands::up::exec(args.global, a).await,
 	}
 }
 

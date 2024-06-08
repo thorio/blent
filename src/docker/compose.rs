@@ -1,9 +1,13 @@
 use super::compose_file::{self, ComposeFile};
+use crate::filter::StackDescriptor;
 use crate::{cli::GlobalArgs, ext::IterExt, filter::IdentifyService, paths};
 use anyhow::{anyhow, bail, Result};
 use std::borrow::Cow;
 use std::fs::{self, DirEntry};
 use std::path::{Path, PathBuf};
+use std::process::Command;
+
+const COMPOSE_BINARY: &str = "docker-compose";
 
 const COMPOSE_FILE_NAMES: &[&str] = &[
 	"compose.yaml",
@@ -28,7 +32,24 @@ impl Compose {
 	}
 
 	pub fn services(&self) -> Result<impl Iterator<Item = Service>> {
-		Ok(self.compose_files()?.flat_map(get_services))
+		Ok(self.compose_files()?.flat_map(into_services))
+	}
+
+	pub fn up(&self, stack: StackDescriptor) {
+		Command::new(COMPOSE_BINARY)
+			.current_dir(self.get_stack_path(stack.stack))
+			.args(["up", "-d"])
+			.args(stack.services)
+			.spawn()
+			.and_then(|mut handle| handle.wait())
+			.unwrap();
+	}
+
+	fn get_stack_path(&self, stack_name: impl AsRef<Path>) -> PathBuf {
+		let mut path = self.app_path.clone();
+		path.push(stack_name);
+
+		path
 	}
 
 	fn compose_files(&self) -> Result<impl Iterator<Item = (String, ComposeFile)>> {
@@ -81,7 +102,7 @@ fn get_stack_name(compose_path: &Path) -> Option<Cow<str>> {
 	Some(compose_path.parent()?.file_name()?.to_string_lossy())
 }
 
-fn get_services((stack, compose_file): (String, ComposeFile)) -> impl Iterator<Item = Service> {
+fn into_services((stack, compose_file): (String, ComposeFile)) -> impl Iterator<Item = Service> {
 	compose_file
 		.services
 		.into_iter()
@@ -89,7 +110,7 @@ fn get_services((stack, compose_file): (String, ComposeFile)) -> impl Iterator<I
 		.filter_err_and(|e| log::warn!("{e}"))
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Service {
 	pub name: String,
 	pub stack: String,

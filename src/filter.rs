@@ -13,7 +13,6 @@ pub trait IterExt: Iterator {
 		self.filter(|s| filters.iter().any(|f| f.filter(s)))
 	}
 
-	#[allow(unused)] // will be used later
 	fn aggregate_services(self) -> impl Iterator<Item = StackDescriptor>
 	where
 		Self: Sized,
@@ -121,6 +120,6 @@ impl FromStr for ServiceDescriptor {
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct StackDescriptor {
-	stack: String,
-	services: Vec<String>,
+	pub stack: String,
+	pub services: Vec<String>,
 }
