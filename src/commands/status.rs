@@ -1,7 +1,7 @@
 use crate::cli::GlobalArgs;
 use crate::docker::compose::Compose;
 use crate::docker::daemon::Docker;
-use crate::eitherext::EitherExt;
+use crate::ext::EitherExt;
 use crate::filter::{IterExt, ServiceFilter};
 use anyhow::Result;
 use itertools::Itertools;

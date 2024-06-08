@@ -1,4 +1,4 @@
-use crate::{cli::GlobalArgs, filter::IdentifyService};
+use crate::{cli::GlobalArgs, ext::IterExt, filter::IdentifyService};
 use anyhow::anyhow;
 use bollard::{container::ListContainersOptions, errors::Error as BollardError, secret::ContainerSummary};
 use itertools::Itertools;
@@ -30,7 +30,7 @@ impl Docker {
 			.await?
 			.into_iter()
 			.map(TryInto::try_into)
-			.filter_map(Result::ok)
+			.filter_err_and(|e| log::debug!("skipping invalid container: {e}"))
 			.sorted()
 			.dedup();
 

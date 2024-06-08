@@ -129,7 +129,6 @@ dependencies = [
  "clap",
  "clap-verbosity-flag",
  "color-eyre",
- "either",
  "itertools",
  "log",
  "serde",

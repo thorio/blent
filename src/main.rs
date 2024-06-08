@@ -6,7 +6,7 @@ use std::process::ExitCode;
 mod cli;
 mod commands;
 mod docker;
-mod eitherext;
+mod ext;
 mod filter;
 mod paths;
 

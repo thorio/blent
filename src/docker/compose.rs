@@ -1,9 +1,16 @@
 use super::compose_file::{self, ComposeFile};
-use crate::{cli::GlobalArgs, filter::IdentifyService, paths};
-use anyhow::{bail, Result};
-use std::{fs, path::PathBuf};
+use crate::{cli::GlobalArgs, ext::IterExt, filter::IdentifyService, paths};
+use anyhow::{anyhow, bail, Result};
+use std::borrow::Cow;
+use std::fs::{self, DirEntry};
+use std::path::{Path, PathBuf};
 
-const COMPOSE_FILE_NAME: &str = "docker-compose.yml";
+const COMPOSE_FILE_NAMES: &[&str] = &[
+	"compose.yaml",
+	"compose.yml",
+	"docker-compose.yaml",
+	"docker-compose.yml",
+];
 
 pub struct Compose {
 	app_path: PathBuf,
@@ -25,27 +32,53 @@ impl Compose {
 	}
 
 	fn compose_files(&self) -> Result<impl Iterator<Item = (String, ComposeFile)>> {
-		let services = fs::read_dir(&self.app_path)?
-			.filter_map(|e| e.map(|e| e.path()).ok())
+		let services = fs::read_dir(&self.app_path)
+			.map_err(|e| anyhow!("{e}"))?
+			.filter_err_and(|e| log::warn!("unreadable path in app dir: {e}"))
+			.filter_map(find_compose_file)
 			.map(read_compose_file)
-			.filter_map(Result::ok);
+			.filter_err_and(|e| log::warn!("unreadable compose file: {e}"));
 
 		Ok(services)
 	}
 }
 
-fn read_compose_file(mut path: PathBuf) -> Result<(String, ComposeFile)> {
-	let stack = path
-		.file_name()
-		.expect("file must have a name")
-		.to_string_lossy()
+fn find_compose_file(entry: DirEntry) -> Option<PathBuf> {
+	let mut path = entry.path();
+
+	// hidden folders are skipped
+	if path.file_name()?.to_string_lossy().starts_with('.') {
+		return None;
+	}
+
+	path.push("placeholder");
+
+	// try all valid compose file names
+	for name in COMPOSE_FILE_NAMES {
+		path.set_file_name(name);
+
+		if path.is_file() {
+			return Some(path);
+		}
+	}
+
+	// folders without compose files are skipped
+	None
+}
+
+fn read_compose_file(path: PathBuf) -> Result<(String, ComposeFile)> {
+	let stack = get_stack_name(&path)
+		.ok_or_else(|| anyhow!("invalid path {path:?}"))?
 		.into_owned();
 
-	path.push(COMPOSE_FILE_NAME);
-
-	let compose_file: ComposeFile = serde_yml::from_reader(fs::File::open(path)?)?;
+	let file = fs::File::open(&path).map_err(|e| anyhow!("{e} ({path:?})"))?;
+	let compose_file: ComposeFile = serde_yml::from_reader(file)?;
 
 	Ok((stack, compose_file))
+}
+
+fn get_stack_name(compose_path: &Path) -> Option<Cow<str>> {
+	Some(compose_path.parent()?.file_name()?.to_string_lossy())
 }
 
 fn get_services((stack, compose_file): (String, ComposeFile)) -> impl Iterator<Item = Service> {
@@ -53,7 +86,7 @@ fn get_services((stack, compose_file): (String, ComposeFile)) -> impl Iterator<I
 		.services
 		.into_iter()
 		.map(move |(name, service)| Service::from_compose(stack.clone(), name, service))
-		.filter_map(Result::ok)
+		.filter_err_and(|e| log::warn!("{e}"))
 }
 
 #[derive(Debug)]
