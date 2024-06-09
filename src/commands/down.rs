@@ -30,7 +30,7 @@ pub async fn exec(global_args: GlobalArgs, args: Args) -> Result<ExitCode> {
 		.aggregate_services();
 
 	for stack in stacks {
-		compose.up(&stack).map_err(|e| anyhow!("{}: {e}", &stack.stack))?;
+		compose.down(&stack).map_err(|e| anyhow!("{}: {e}", &stack.stack))?;
 	}
 
 	Ok(ExitCode::SUCCESS)
