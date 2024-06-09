@@ -3,7 +3,6 @@ use crate::filter::StackDescriptor;
 use crate::{cli::GlobalArgs, ext::IterExt, filter::IdentifyService, paths};
 use anyhow::{anyhow, bail, Result};
 use std::borrow::Cow;
-use std::ffi::OsStr;
 use std::fs::{self, DirEntry};
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -36,22 +35,25 @@ impl Compose {
 		Ok(self.compose_files()?.flat_map(into_services))
 	}
 
-	pub fn up(&self, stack: &StackDescriptor) -> Result<()> {
-		self.run_service_command(&stack.stack, &["up", "-d"], &stack.services)
+	pub fn up(&self, stack: &StackDescriptor, extra_args: &Vec<String>) -> Result<()> {
+		self.run_service_command(&stack.stack, &["up", "-d"], extra_args, &stack.services)
 	}
 
-	pub fn down(&self, stack: &StackDescriptor) -> Result<()> {
-		self.run_service_command(&stack.stack, &["down", "--remove-orphans"], &stack.services)
+	pub fn down(&self, stack: &StackDescriptor, extra_args: &Vec<String>) -> Result<()> {
+		self.run_service_command(&stack.stack, &["down"], extra_args, &stack.services)
 	}
 
-	fn run_service_command<I, S>(&self, stack: &str, args: &[&str], services: I) -> Result<()>
-	where
-		I: IntoIterator<Item = S>,
-		S: AsRef<OsStr>,
-	{
+	fn run_service_command(
+		&self,
+		stack: &str,
+		args: &[&str],
+		extra_args: &Vec<String>,
+		services: &Vec<String>,
+	) -> Result<()> {
 		let status = Command::new(COMPOSE_BINARY)
 			.current_dir(self.get_stack_path(stack))
 			.args(args)
+			.args(extra_args)
 			.args(services)
 			.spawn()
 			.and_then(|mut handle| handle.wait())?;

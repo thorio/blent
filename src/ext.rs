@@ -8,6 +8,16 @@ pub trait IntoEither {
 		self.either_or(is_left, left, |s| s)
 	}
 
+	fn either_with<T, A>(self, arg: Option<A>, f: impl FnOnce(Self, A) -> T) -> Either<T, Self>
+	where
+		Self: Sized,
+	{
+		match arg {
+			Some(v) => Either::Left(f(self, v)),
+			None => Either::Right(self),
+		}
+	}
+
 	fn either_or<L, R>(self, is_left: bool, left: impl FnOnce(Self) -> L, right: impl FnOnce(Self) -> R) -> Either<L, R>
 	where
 		Self: Sized,
