@@ -30,7 +30,7 @@ pub async fn exec_up(global_args: GlobalArgs, args: UpArgs) -> Result<ExitCode> 
 	exec(global_args, args.target, |c, s| c.up(s, &extra_args)).await
 }
 
-/// Create and start stacks
+/// Stop and remove stacks
 #[derive(clap::Args, Debug)]
 pub struct DownArgs {
 	#[command(flatten)]

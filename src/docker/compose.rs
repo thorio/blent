@@ -43,6 +43,10 @@ impl Compose {
 		self.run_service_command(&stack.stack, &["down"], extra_args, &stack.services)
 	}
 
+	pub fn logs(&self, stack: &StackDescriptor, extra_args: &Vec<String>) -> Result<()> {
+		self.run_service_command(&stack.stack, &["logs"], extra_args, &stack.services)
+	}
+
 	fn run_service_command(
 		&self,
 		stack: &str,

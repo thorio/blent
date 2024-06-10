@@ -46,6 +46,7 @@ pub enum Command {
 	Status(commands::status::Args),
 	Up(commands::updown::UpArgs),
 	Down(commands::updown::DownArgs),
+	Logs(commands::logs::Args),
 }
 
 #[derive(clap::Args, Debug)]
