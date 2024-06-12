@@ -44,7 +44,7 @@ pub async fn exec(global_args: GlobalArgs, args: Args) -> Result<ExitCode> {
 		extra_args.push(String::from("--follow"));
 	}
 
-	compose.logs(stack, &extra_args)?;
+	compose.logs(stack, &extra_args, true)?;
 
 	Ok(ExitCode::SUCCESS)
 }

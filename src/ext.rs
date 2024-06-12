@@ -32,6 +32,23 @@ pub trait IntoEither {
 
 impl<T> IntoEither for T {}
 
+pub trait EitherExt<T> {
+	fn unwrap(self) -> T
+	where
+		Self: Sized;
+}
+
+impl<T> EitherExt<T> for Either<T, T> {
+	/// Unwraps either side of the `Either`, if both sides have identical types.
+	/// always returns a value.
+	fn unwrap(self) -> T {
+		match self {
+			Either::Left(l) => l,
+			Either::Right(r) => r,
+		}
+	}
+}
+
 pub trait IterExt {
 	/// Returns an iterator adapter with only the `Result::Ok` values,
 	/// calling the provided closure on every `Result::Err` value.

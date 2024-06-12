@@ -1,9 +1,11 @@
 use super::compose_file::{self, ComposeFile};
+use crate::ext::{EitherExt, IntoEither};
 use crate::filter::StackDescriptor;
 use crate::{cli::GlobalArgs, ext::IterExt, filter::IdentifyService, paths};
 use anyhow::{anyhow, bail, Result};
 use std::borrow::Cow;
 use std::fs::{self, DirEntry};
+use std::os::unix::process::CommandExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
@@ -36,15 +38,15 @@ impl Compose {
 	}
 
 	pub fn up(&self, stack: &StackDescriptor, extra_args: &Vec<String>) -> Result<()> {
-		self.run_service_command(&stack.stack, &["up", "-d"], extra_args, &stack.services)
+		self.run_service_command(&stack.stack, &["up", "-d"], extra_args, &stack.services, false)
 	}
 
 	pub fn down(&self, stack: &StackDescriptor, extra_args: &Vec<String>) -> Result<()> {
-		self.run_service_command(&stack.stack, &["down"], extra_args, &stack.services)
+		self.run_service_command(&stack.stack, &["down"], extra_args, &stack.services, false)
 	}
 
-	pub fn logs(&self, stack: &StackDescriptor, extra_args: &Vec<String>) -> Result<()> {
-		self.run_service_command(&stack.stack, &["logs"], extra_args, &stack.services)
+	pub fn logs(&self, stack: &StackDescriptor, extra_args: &Vec<String>, exec: bool) -> Result<()> {
+		self.run_service_command(&stack.stack, &["logs"], extra_args, &stack.services, exec)
 	}
 
 	fn run_service_command(
@@ -53,13 +55,15 @@ impl Compose {
 		args: &[&str],
 		extra_args: &Vec<String>,
 		services: &Vec<String>,
+		exec: bool,
 	) -> Result<()> {
 		let status = Command::new(COMPOSE_BINARY)
 			.current_dir(self.get_stack_path(stack))
 			.args(args)
 			.args(extra_args)
 			.args(services)
-			.spawn()
+			.either_or(exec, |c| Err(c.exec()), |c| c.spawn())
+			.unwrap()
 			.and_then(|mut handle| handle.wait())?;
 
 		if !status.success() {
