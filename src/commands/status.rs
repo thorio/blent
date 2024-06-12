@@ -35,10 +35,9 @@ pub async fn exec(global_args: GlobalArgs, args: Args) -> Result<ExitCode> {
 	for service in services {
 		let docker_service = docker_service_map
 			.get(&(&service.stack, &service.name))
-			.map(|s| s.status.as_str())
-			.unwrap_or("Missing");
+			.map_or("Missing", |s| s.status.as_str());
 
-		println!("{}: {}, ({})", service.stack, service.name, docker_service)
+		println!("{}: {}, ({})", service.stack, service.name, docker_service);
 	}
 
 	Ok(ExitCode::SUCCESS)

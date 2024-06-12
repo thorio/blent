@@ -20,14 +20,14 @@ pub struct UpArgs {
 	compose_args: Vec<String>,
 }
 
-pub async fn exec_up(global_args: GlobalArgs, args: UpArgs) -> Result<ExitCode> {
+pub fn exec_up(global_args: GlobalArgs, args: UpArgs) -> Result<ExitCode> {
 	let mut extra_args = args.compose_args;
 
 	if args.force_recreate {
 		extra_args.push(String::from("--force-recreate"));
 	}
 
-	exec(global_args, args.target, |c, s| c.up(s, &extra_args)).await
+	exec(global_args, args.target, |c, s| c.up(s, &extra_args))
 }
 
 /// Stop and remove stacks
@@ -45,17 +45,17 @@ pub struct DownArgs {
 	compose_args: Vec<String>,
 }
 
-pub async fn exec_down(global_args: GlobalArgs, args: DownArgs) -> Result<ExitCode> {
+pub fn exec_down(global_args: GlobalArgs, args: DownArgs) -> Result<ExitCode> {
 	let mut extra_args = args.compose_args;
 
 	if args.remove_orphans {
 		extra_args.push(String::from("--remove-orphans"));
 	}
 
-	exec(global_args, args.target, |c, s| c.down(s, &extra_args)).await
+	exec(global_args, args.target, |c, s| c.down(s, &extra_args))
 }
 
-async fn exec<F>(global_args: GlobalArgs, target: FilterOrAll, f: F) -> Result<ExitCode>
+fn exec<F>(global_args: GlobalArgs, target: FilterOrAll, f: F) -> Result<ExitCode>
 where
 	F: Fn(&Compose, &StackDescriptor) -> Result<()>,
 {

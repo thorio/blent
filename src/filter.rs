@@ -22,7 +22,7 @@ pub trait IterExt: Iterator {
 			.into_iter()
 			.map(|(k, v)| StackDescriptor {
 				stack: k,
-				services: v.into_iter().map(|v| v.into_service()).collect_vec(),
+				services: v.into_iter().map(IdentifyService::into_service).collect_vec(),
 			})
 	}
 }
@@ -58,13 +58,13 @@ impl FromStr for ServiceFilter {
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
 		let mut split = s.split(ARG_SEPARATOR);
 		let stack = split.next().expect("split always returns at least one item").trim();
-		let service = split.next().map(|s| s.trim());
+		let service = split.next().map(str::trim);
 
 		if stack.is_empty() {
 			bail!("no stack specified");
 		}
 
-		if service.is_some_and(|s| s.is_empty()) {
+		if service.is_some_and(str::is_empty) {
 			bail!("trailing '{ARG_SEPARATOR}' is not allowed")
 		}
 

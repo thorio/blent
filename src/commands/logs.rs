@@ -21,7 +21,7 @@ pub struct Args {
 	compose_args: Vec<String>,
 }
 
-pub async fn exec(global_args: GlobalArgs, args: Args) -> Result<ExitCode> {
+pub fn exec(global_args: GlobalArgs, args: Args) -> Result<ExitCode> {
 	let compose = Compose::new(&global_args)?;
 
 	let stacks = compose

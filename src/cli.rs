@@ -1,10 +1,10 @@
 use crate::{commands, filter::ServiceFilter};
-use clap::{Args, Parser, Subcommand};
+use clap::{Parser, Subcommand};
 use clap_verbosity_flag::{Verbosity, WarnLevel};
 use std::path::PathBuf;
 
-pub fn parse() -> CliArgs {
-	CliArgs::parse()
+pub fn parse() -> Args {
+	Args::parse()
 }
 
 #[derive(Parser, Debug)]
@@ -14,7 +14,7 @@ pub fn parse() -> CliArgs {
 	disable_help_subcommand = true,
 	disable_version_flag = true
 )]
-pub struct CliArgs {
+pub struct Args {
 	#[command(flatten)]
 	pub global: GlobalArgs,
 
@@ -34,7 +34,7 @@ pub struct CliArgs {
 	_version: Option<bool>,
 }
 
-#[derive(Args, Debug)]
+#[derive(clap::Args, Debug)]
 pub struct GlobalArgs {
 	/// Directory in which to look for stacks [default: ~/apps]
 	#[arg(long, value_name = "PATH", global = true)]

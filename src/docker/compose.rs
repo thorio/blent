@@ -62,7 +62,7 @@ impl Compose {
 			.args(args)
 			.args(extra_args)
 			.args(services)
-			.either_or(exec, |c| Err(c.exec()), |c| c.spawn())
+			.either_or(exec, |c| Err(c.exec()), Command::spawn)
 			.unwrap()
 			.and_then(|mut handle| handle.wait())?;
 
@@ -136,7 +136,6 @@ fn into_services((stack, compose_file): (String, ComposeFile)) -> impl Iterator<
 		.services
 		.into_iter()
 		.map(move |(name, service)| Service::from_compose(stack.clone(), name, service))
-		.filter_err_and(|e| log::warn!("{e}"))
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -146,8 +145,8 @@ pub struct Service {
 }
 
 impl Service {
-	fn from_compose(stack: String, name: String, _service: compose_file::Service) -> Result<Service> {
-		Ok(Service { stack, name })
+	fn from_compose(stack: String, name: String, _service: compose_file::Service) -> Service {
+		Service { name, stack }
 	}
 }
 

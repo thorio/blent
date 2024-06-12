@@ -1,5 +1,8 @@
+#![warn(clippy::semicolon_if_nothing_returned)]
+#![warn(clippy::redundant_closure_for_method_calls)]
+#![warn(clippy::unused_async)]
+
 use anyhow::Result;
-use cli::CliArgs;
 use log::LevelFilter;
 use std::process::ExitCode;
 
@@ -27,14 +30,14 @@ async fn main() -> ExitCode {
 	}
 }
 
-async fn run_command(args: CliArgs) -> Result<ExitCode> {
+async fn run_command(args: cli::Args) -> Result<ExitCode> {
 	use cli::Command as cmd;
 
 	match args.command {
 		cmd::Status(a) => commands::status::exec(args.global, a).await,
-		cmd::Up(a) => commands::updown::exec_up(args.global, a).await,
-		cmd::Down(a) => commands::updown::exec_down(args.global, a).await,
-		cmd::Logs(a) => commands::logs::exec(args.global, a).await,
+		cmd::Up(a) => commands::updown::exec_up(args.global, a),
+		cmd::Down(a) => commands::updown::exec_down(args.global, a),
+		cmd::Logs(a) => commands::logs::exec(args.global, a),
 	}
 }
 
