@@ -1,7 +1,3 @@
-#![warn(clippy::semicolon_if_nothing_returned)]
-#![warn(clippy::redundant_closure_for_method_calls)]
-#![warn(clippy::unused_async)]
-
 use anyhow::Result;
 use log::LevelFilter;
 use std::process::ExitCode;

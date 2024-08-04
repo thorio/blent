@@ -21,7 +21,6 @@ pub struct Args {
 	#[command(subcommand)]
 	pub command: Command,
 
-	/// enable debug loglevel
 	#[command(flatten)]
 	pub verbosity: Verbosity<WarnLevel>,
 

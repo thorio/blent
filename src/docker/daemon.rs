@@ -43,6 +43,7 @@ pub struct Service {
 	pub name: String,
 	pub stack: String,
 	pub status: String,
+	#[allow(dead_code)]
 	pub running: bool,
 }
 
