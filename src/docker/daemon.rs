@@ -82,10 +82,6 @@ impl IdentifyService for Service {
 	fn service(&'_ self) -> &'_ str {
 		&self.name
 	}
-
-	fn into_service(self) -> String {
-		self.name
-	}
 }
 
 impl PartialEq for Service {

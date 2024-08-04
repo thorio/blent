@@ -1,3 +1,4 @@
+pub mod down;
 pub mod logs;
 pub mod status;
-pub mod updown;
+pub mod up;

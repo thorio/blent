@@ -43,8 +43,8 @@ pub struct GlobalArgs {
 #[derive(Subcommand, Debug)]
 pub enum Command {
 	Status(commands::status::Args),
-	Up(commands::updown::UpArgs),
-	Down(commands::updown::DownArgs),
+	Up(commands::up::Args),
+	Down(commands::down::Args),
 	Logs(commands::logs::Args),
 }
 

@@ -31,8 +31,8 @@ async fn run_command(args: cli::Args) -> Result<ExitCode> {
 
 	match args.command {
 		cmd::Status(a) => commands::status::exec(args.global, a).await,
-		cmd::Up(a) => commands::updown::exec_up(args.global, a),
-		cmd::Down(a) => commands::updown::exec_down(args.global, a),
+		cmd::Up(a) => commands::up::exec(args.global, a),
+		cmd::Down(a) => commands::down::exec(args.global, a),
 		cmd::Logs(a) => commands::logs::exec(args.global, a),
 	}
 }

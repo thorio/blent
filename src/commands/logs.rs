@@ -1,6 +1,6 @@
 use crate::cli::GlobalArgs;
 use crate::docker::compose::Compose;
-use crate::filter::{IterExt, ServiceFilter};
+use crate::filter::{FilterIterExt, ServiceFilter};
 use anyhow::{bail, Result};
 use itertools::Itertools;
 use std::process::ExitCode;

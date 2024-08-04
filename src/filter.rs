@@ -4,7 +4,7 @@ use std::str::FromStr;
 
 const ARG_SEPARATOR: char = ':';
 
-pub trait IterExt: Iterator {
+pub trait FilterIterExt: Iterator {
 	fn filter_services(self, filters: &[impl FilterService]) -> impl Iterator<Item = Self::Item>
 	where
 		Self: Sized,
@@ -13,21 +13,18 @@ pub trait IterExt: Iterator {
 		self.filter(|s| filters.iter().any(|f| f.filter(s)))
 	}
 
-	fn aggregate_services(self) -> impl Iterator<Item = StackDescriptor>
+	fn aggregate_services(self) -> impl Iterator<Item = StackDescriptor<Self::Item>>
 	where
 		Self: Sized,
 		Self::Item: IdentifyService + Ord,
 	{
 		self.into_group_map_by(|s| s.stack().to_owned())
 			.into_iter()
-			.map(|(k, v)| StackDescriptor {
-				stack: k,
-				services: v.into_iter().map(IdentifyService::into_service).collect_vec(),
-			})
+			.map(|(stack, services)| StackDescriptor { stack, services })
 	}
 }
 
-impl<T: Iterator> IterExt for T {}
+impl<T: Iterator> FilterIterExt for T {}
 
 pub trait FilterService {
 	fn filter(&self, service: &impl IdentifyService) -> bool;
@@ -36,7 +33,6 @@ pub trait FilterService {
 pub trait IdentifyService {
 	fn stack(&'_ self) -> &'_ str;
 	fn service(&'_ self) -> &'_ str;
-	fn into_service(self) -> String;
 }
 
 #[derive(Debug, Clone)]
@@ -99,10 +95,6 @@ impl IdentifyService for ServiceDescriptor {
 	fn service(&'_ self) -> &'_ str {
 		&self.service
 	}
-
-	fn into_service(self) -> String {
-		self.service
-	}
 }
 
 impl FromStr for ServiceDescriptor {
@@ -119,7 +111,7 @@ impl FromStr for ServiceDescriptor {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub struct StackDescriptor {
+pub struct StackDescriptor<T> {
 	pub stack: String,
-	pub services: Vec<String>,
+	pub services: Vec<T>,
 }

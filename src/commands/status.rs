@@ -2,7 +2,7 @@ use crate::cli::GlobalArgs;
 use crate::docker::compose::Compose;
 use crate::docker::daemon::Docker;
 use crate::ext::IntoEither;
-use crate::filter::{IterExt, ServiceFilter};
+use crate::filter::{FilterIterExt, ServiceFilter};
 use anyhow::Result;
 use itertools::Itertools;
 use std::collections::HashMap;

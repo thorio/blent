@@ -1,6 +1,7 @@
 use super::compose_file::{self, ComposeFile};
+use crate::cli::FilterOrAll;
 use crate::ext::{EitherExt, IntoEither};
-use crate::filter::StackDescriptor;
+use crate::filter::{FilterIterExt, StackDescriptor};
 use crate::{cli::GlobalArgs, ext::IterExt, filter::IdentifyService, paths};
 use anyhow::{anyhow, bail, Result};
 use std::borrow::Cow;
@@ -37,31 +38,41 @@ impl Compose {
 		Ok(self.compose_files()?.flat_map(into_services))
 	}
 
-	pub fn up(&self, stack: &StackDescriptor, extra_args: &Vec<String>) -> Result<()> {
+	pub fn up(&self, stack: &StackDescriptor<Service>, extra_args: &[String]) -> Result<()> {
 		self.run_service_command(&stack.stack, &["up", "-d"], extra_args, &stack.services, false)
 	}
 
-	pub fn down(&self, stack: &StackDescriptor, extra_args: &Vec<String>) -> Result<()> {
+	pub fn down(&self, stack: &StackDescriptor<Service>, extra_args: &[String]) -> Result<()> {
 		self.run_service_command(&stack.stack, &["down"], extra_args, &stack.services, false)
 	}
 
-	pub fn logs(&self, stack: &StackDescriptor, extra_args: &Vec<String>, exec: bool) -> Result<()> {
+	pub fn logs(&self, stack: &StackDescriptor<Service>, extra_args: &[String], exec: bool) -> Result<()> {
 		self.run_service_command(&stack.stack, &["logs"], extra_args, &stack.services, exec)
+	}
+
+	pub fn exec_stacks<F>(&self, target: FilterOrAll, f: F) -> Result<()>
+	where
+		F: Fn(&Self, &StackDescriptor<Service>) -> Result<()>,
+	{
+		self.services()?
+			.either_with(target.filter(), |i, f| i.filter_services(f))
+			.aggregate_services()
+			.try_for_each(|s| f(self, &s).map_err(|e| anyhow!("{}: {e}", &s.stack)))
 	}
 
 	fn run_service_command(
 		&self,
 		stack: &str,
 		args: &[&str],
-		extra_args: &Vec<String>,
-		services: &Vec<String>,
+		extra_args: &[String],
+		services: &[impl IdentifyService],
 		exec: bool,
 	) -> Result<()> {
 		let status = Command::new(COMPOSE_BINARY)
 			.current_dir(self.get_stack_path(stack))
 			.args(args)
 			.args(extra_args)
-			.args(services)
+			.args(services.iter().map(|s| s.service()))
 			.either_or(exec, |c| Err(c.exec()), Command::spawn)
 			.unwrap()
 			.and_then(|mut handle| handle.wait())?;
@@ -157,9 +168,5 @@ impl IdentifyService for Service {
 
 	fn service(&'_ self) -> &'_ str {
 		&self.name
-	}
-
-	fn into_service(self) -> String {
-		self.name
 	}
 }
