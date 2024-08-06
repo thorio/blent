@@ -2,6 +2,7 @@ use super::compose_file::{self, ComposeFile};
 use crate::cli::FilterOrAll;
 use crate::ext::{EitherExt, IntoEither};
 use crate::filter::{FilterIterExt, StackDescriptor};
+use crate::terminal::Progress;
 use crate::{cli::GlobalArgs, ext::IterExt, filter::IdentifyService, paths};
 use anyhow::{anyhow, bail, Result};
 use std::borrow::Cow;
@@ -52,12 +53,13 @@ impl Compose {
 
 	pub fn exec_stacks<F>(&self, target: FilterOrAll, f: F) -> Result<()>
 	where
-		F: Fn(&Self, &StackDescriptor<Service>) -> Result<()>,
+		F: Fn(&Self, &StackDescriptor<Service>, Progress) -> Result<()>,
 	{
 		self.services()?
 			.either_with(target.filter(), |i, f| i.filter_services(f))
 			.aggregate_services()
-			.try_for_each(|s| f(self, &s).map_err(|e| anyhow!("{}: {e}", &s.stack)))
+			.with_progress()
+			.try_for_each(|(p, s)| f(self, &s, p).map_err(|e| anyhow!("{}: {e}", &s.stack)))
 	}
 
 	fn run_service_command(

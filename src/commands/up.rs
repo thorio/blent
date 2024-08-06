@@ -1,5 +1,6 @@
 use crate::cli::FilterOrAll;
 use crate::services::Services;
+use crate::terminal::exec_stacks_pretty;
 use anyhow::Result;
 use std::process::ExitCode;
 
@@ -25,9 +26,7 @@ pub fn exec(services: Services, args: Args) -> Result<ExitCode> {
 		extra_args.push(String::from("--force-recreate"));
 	}
 
-	services
-		.compose()?
-		.exec_stacks(args.target, |c, s| c.up(s, &extra_args))?;
+	exec_stacks_pretty(&services, args.target, |c, s| c.up(s, &extra_args))?;
 
 	Ok(ExitCode::SUCCESS)
 }

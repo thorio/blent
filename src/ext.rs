@@ -1,4 +1,6 @@
+use crate::terminal::Progress;
 use itertools::Either;
+use itertools::Itertools;
 use std::convert::identity;
 
 pub trait IntoEither: Sized {
@@ -70,6 +72,16 @@ pub trait IterExt: Iterator + Sized {
 
 	fn filter_count(self, predicate: impl FnMut(&Self::Item) -> bool) -> usize {
 		self.filter(predicate).count()
+	}
+
+	fn with_progress(self) -> impl Iterator<Item = (Progress, Self::Item)> {
+		let items = self.collect_vec();
+		let count = items.len() as u8;
+
+		items
+			.into_iter()
+			.enumerate()
+			.map(move |(i, v)| (Progress::new(i as u8 + 1, count), v))
 	}
 }
 

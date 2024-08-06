@@ -9,6 +9,7 @@ mod ext;
 mod filter;
 mod paths;
 mod services;
+mod terminal;
 
 #[tokio::main(flavor = "current_thread")]
 #[allow(clippy::unwrap_used)]
