@@ -12,10 +12,10 @@ pub struct Docker {
 }
 
 impl Docker {
-	pub fn connect(_args: &GlobalArgs) -> Result<Docker, BollardError> {
+	pub fn connect(_args: &GlobalArgs) -> Result<Self, BollardError> {
 		let bollard = bollard::Docker::connect_with_defaults()?;
 
-		Ok(Docker { bollard })
+		Ok(Self { bollard })
 	}
 
 	pub async fn services(&self) -> Result<impl Iterator<Item = Service>, BollardError> {
@@ -38,37 +38,54 @@ impl Docker {
 	}
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Service {
 	pub name: String,
 	pub stack: String,
 	pub status: String,
-	#[allow(dead_code)]
+	pub image: String,
+	pub created: Option<i64>,
 	pub running: bool,
+}
+
+impl Default for Service {
+	fn default() -> Self {
+		Self {
+			name: Default::default(),
+			stack: Default::default(),
+			status: String::from("Missing"),
+			image: Default::default(),
+			created: Default::default(),
+			running: Default::default(),
+		}
+	}
 }
 
 impl TryFrom<ContainerSummary> for Service {
 	type Error = anyhow::Error;
 
 	fn try_from(value: ContainerSummary) -> Result<Self, Self::Error> {
-		let mut labels = value.labels.ok_or(anyhow!("no labels"))?;
+		let mut labels = value.labels.ok_or_else(|| anyhow!("no labels"))?;
 
 		let name = labels
 			.remove(COMPOSE_SERVICE_LABEL)
-			.ok_or(anyhow!("no service label"))?;
+			.ok_or_else(|| anyhow!("no service label"))?;
 
 		let stack = labels
 			.remove(COMPOSE_PROJECT_LABEL)
-			.ok_or(anyhow!("no project label"))?;
+			.ok_or_else(|| anyhow!("no project label"))?;
 
-		let status = value.status.ok_or(anyhow!("no status"))?;
+		let status = value.status.ok_or_else(|| anyhow!("no status"))?;
+		let running = value.state.ok_or_else(|| anyhow!("no state"))? == DOCKER_STATE_RUNNING;
+		let image = value.image.ok_or_else(|| anyhow!("no image"))?;
+		let created = value.created.ok_or_else(|| anyhow!("no created date"))?;
 
-		let running = value.state.ok_or(anyhow!("no state"))? == DOCKER_STATE_RUNNING;
-
-		Ok(Service {
+		Ok(Self {
 			name,
 			stack,
 			status,
+			image,
+			created: Some(created),
 			running,
 		})
 	}

@@ -10,17 +10,18 @@ mod filter;
 mod paths;
 
 #[tokio::main(flavor = "current_thread")]
+#[allow(clippy::unwrap_used)]
 async fn main() -> ExitCode {
 	color_eyre::install().unwrap();
 
 	let args = cli::parse();
 
-	init_log(args.verbosity.log_level_filter());
+	init_log(args.verbosity.log_level_filter()).unwrap();
 
 	match run_command(args).await {
 		Ok(code) => code,
 		Err(err) => {
-			println!("ERROR: {err}");
+			log::error!("{err}");
 			ExitCode::FAILURE
 		}
 	}
@@ -37,8 +38,10 @@ async fn run_command(args: cli::Args) -> Result<ExitCode> {
 	}
 }
 
-fn init_log(_level: LevelFilter) {
-	// TODO
+fn init_log(level: LevelFilter) -> Result<()> {
+	stderrlog::new().verbosity(level).init()?;
 
 	log::trace!("hello world");
+
+	Ok(())
 }

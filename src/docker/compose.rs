@@ -24,14 +24,14 @@ pub struct Compose {
 }
 
 impl Compose {
-	pub fn new(args: &GlobalArgs) -> Result<Compose> {
+	pub fn new(args: &GlobalArgs) -> Result<Self> {
 		let app_path = args.app_path.as_ref().map_or_else(paths::default_apps, Clone::clone);
 
 		if !app_path.is_dir() {
 			bail!("app directory '{}' does not exist", app_path.to_string_lossy())
 		}
 
-		Ok(Compose { app_path })
+		Ok(Self { app_path })
 	}
 
 	pub fn services(&self) -> Result<impl Iterator<Item = Service>> {
@@ -72,7 +72,7 @@ impl Compose {
 			.current_dir(self.get_stack_path(stack))
 			.args(args)
 			.args(extra_args)
-			.args(services.iter().map(|s| s.service()))
+			.args(services.iter().map(IdentifyService::service))
 			.either_or(exec, |c| Err(c.exec()), Command::spawn)
 			.unwrap()
 			.and_then(|mut handle| handle.wait())?;
@@ -156,8 +156,8 @@ pub struct Service {
 }
 
 impl Service {
-	fn from_compose(stack: String, name: String, _service: compose_file::Service) -> Service {
-		Service { name, stack }
+	fn from_compose(stack: String, name: String, _service: compose_file::Service) -> Self {
+		Self { name, stack }
 	}
 }
 

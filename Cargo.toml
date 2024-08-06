@@ -10,24 +10,24 @@ repository = "https://github.com/thorio/blent"
 [dependencies]
 anyhow = "1.0.86"
 bollard = "0.17.0"
+chrono = { version = "0.4.38", default-features = false }
+chrono-humanize = "0.2.3"
 clap = { version = "4.5.4", features = ["derive"] }
 clap-verbosity-flag = "2.2.0"
 color-eyre = "0.6.3"
+comfy-table = "7.1.1"
 itertools = "0.13.0"
 log = "0.4.21"
 serde = { version = "1.0.203", features = ["derive"] }
 serde_yml = "0.0.11"
+stderrlog = { version = "0.6.0", default-features = false }
 tokio = { version = "1.38.0", features = ["macros"] }
 
 [profile.release]
 strip = true
 lto = true
 
-# improve debug backtrace performance with color-eyre
-[profile.dev.package.backtrace]
-opt-level = 3
-
-[workspace.lints.rust]
+[lints.rust]
 non_ascii_idents = "forbid"
 noop_method_call = "warn"
 single_use_lifetimes = "warn"
@@ -35,7 +35,7 @@ unused_crate_dependencies = "warn"
 unused_lifetimes = "deny"
 unused_qualifications = "warn"
 
-[workspace.lints.clippy]
+[lints.clippy]
 cognitive_complexity = "warn"
 dbg_macro = "warn"
 empty_structs_with_brackets = "warn"
@@ -43,8 +43,6 @@ equatable_if_let = "warn"
 explicit_iter_loop = "warn"
 match_wildcard_for_single_variants = "warn"
 or_fun_call = "warn"
-print_stderr = "warn"
-print_stdout = "warn"
 question_mark = "warn"
 redundant_closure_for_method_calls = "warn"
 semicolon_if_nothing_returned = "warn"

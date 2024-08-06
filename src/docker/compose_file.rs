@@ -9,6 +9,7 @@ pub struct ComposeFile {
 }
 
 #[derive(Debug, Deserialize)]
+#[allow(clippy::empty_structs_with_brackets)]
 pub struct Service {
 	// Nothing here yet
 }
