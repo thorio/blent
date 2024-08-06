@@ -1,8 +1,8 @@
-use crate::cli::GlobalArgs;
-use crate::docker::compose::{self, Compose};
-use crate::docker::daemon::{self, Docker};
 use crate::ext::{IntoEither, IterExt};
 use crate::filter::{FilterIterExt, IdentifyService, ServiceFilter, StackDescriptor};
+use crate::services::compose::{self};
+use crate::services::docker::{self};
+use crate::services::Services;
 use anyhow::Result;
 use chrono::{DateTime, Local, Utc};
 use chrono_humanize::HumanTime;
@@ -28,7 +28,7 @@ pub struct Args {
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ServiceStatus {
 	pub compose: compose::Service,
-	pub daemon: Option<daemon::Service>,
+	pub daemon: Option<docker::Service>,
 }
 
 impl IdentifyService for ServiceStatus {
@@ -41,8 +41,8 @@ impl IdentifyService for ServiceStatus {
 	}
 }
 
-pub async fn exec(global_args: GlobalArgs, args: Args) -> Result<ExitCode> {
-	let stacks = get_stacks(&global_args, &args.filter).await?;
+pub async fn exec(services: Services, args: Args) -> Result<ExitCode> {
+	let stacks = get_stacks(&services, &args.filter).await?;
 
 	let mut table = Table::new();
 	table
@@ -121,15 +121,13 @@ fn running_count(services: &[ServiceStatus]) -> usize {
 }
 
 pub async fn get_stacks(
-	global_args: &GlobalArgs,
+	services: &Services,
 	filter: &[ServiceFilter],
 ) -> Result<impl Iterator<Item = StackDescriptor<ServiceStatus>>> {
-	let docker = Docker::connect(global_args)?;
-	let compose = Compose::new(global_args)?;
+	let docker_services = services.docker()?.services().await?;
 
-	let docker_services = docker.services().await?;
-
-	let stacks = compose
+	let stacks = services
+		.compose()?
 		.services()?
 		.sorted()
 		.either(!filter.is_empty(), |i| i.filter_services(filter))

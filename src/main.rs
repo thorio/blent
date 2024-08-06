@@ -1,13 +1,14 @@
 use anyhow::Result;
 use log::LevelFilter;
+use services::Services;
 use std::process::ExitCode;
 
 mod cli;
 mod commands;
-mod docker;
 mod ext;
 mod filter;
 mod paths;
+mod services;
 
 #[tokio::main(flavor = "current_thread")]
 #[allow(clippy::unwrap_used)]
@@ -30,11 +31,13 @@ async fn main() -> ExitCode {
 async fn run_command(args: cli::Args) -> Result<ExitCode> {
 	use cli::Command as cmd;
 
+	let services = Services::new(args.global);
+
 	match args.command {
-		cmd::Status(a) => commands::status::exec(args.global, a).await,
-		cmd::Up(a) => commands::up::exec(args.global, a),
-		cmd::Down(a) => commands::down::exec(args.global, a),
-		cmd::Logs(a) => commands::logs::exec(args.global, a),
+		cmd::Status(a) => commands::status::exec(services, a).await,
+		cmd::Up(a) => commands::up::exec(services, a),
+		cmd::Down(a) => commands::down::exec(services, a),
+		cmd::Logs(a) => commands::logs::exec(services, a),
 	}
 }
 

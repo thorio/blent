@@ -1,6 +1,5 @@
-use crate::cli::GlobalArgs;
-use crate::docker::compose::Compose;
 use crate::filter::{FilterIterExt, ServiceFilter};
+use crate::services::Services;
 use anyhow::{bail, Result};
 use itertools::Itertools;
 use std::process::ExitCode;
@@ -21,8 +20,8 @@ pub struct Args {
 	compose_args: Vec<String>,
 }
 
-pub fn exec(global_args: GlobalArgs, args: Args) -> Result<ExitCode> {
-	let compose = Compose::new(&global_args)?;
+pub fn exec(services: Services, args: Args) -> Result<ExitCode> {
+	let compose = services.compose()?;
 
 	let stacks = compose
 		.services()?
