@@ -51,6 +51,10 @@ impl Compose {
 		self.run_service_command(&stack.stack, &["logs"], extra_args, &stack.services, exec)
 	}
 
+	pub fn pull(&self, stack: &StackDescriptor<Service>, extra_args: &[String]) -> Result<()> {
+		self.run_service_command(&stack.stack, &["pull"], extra_args, &stack.services, false)
+	}
+
 	pub fn exec_stacks<F>(&self, target: FilterOrAll, f: F) -> Result<()>
 	where
 		F: Fn(&Self, &StackDescriptor<Service>, Progress) -> Result<()>,

@@ -36,6 +36,19 @@ impl Docker {
 
 		Ok(services)
 	}
+
+	pub async fn prune_images(&self) -> Result<PruneSuccess, BollardError> {
+		let response = self.bollard.prune_images::<String>(None).await?;
+
+		let pruned_images = response
+			.images_deleted
+			.map_or(0, |v| v.iter().filter_count(|i| i.untagged.is_some()));
+
+		Ok(PruneSuccess {
+			reclaimed_bytes: response.space_reclaimed.map_or(0, |i| i as u64),
+			pruned_images,
+		})
+	}
 }
 
 #[derive(Debug, Clone)]
@@ -119,4 +132,9 @@ impl Ord for Service {
 	fn cmp(&self, other: &Self) -> std::cmp::Ordering {
 		self.stack.cmp(&other.stack).then(self.name.cmp(&other.name))
 	}
+}
+
+pub struct PruneSuccess {
+	pub reclaimed_bytes: u64,
+	pub pruned_images: usize,
 }

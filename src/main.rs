@@ -39,6 +39,7 @@ async fn run_command(args: cli::Args) -> Result<ExitCode> {
 		cmd::Up(a) => commands::up::exec(services, a),
 		cmd::Down(a) => commands::down::exec(services, a),
 		cmd::Logs(a) => commands::logs::exec(services, a),
+		cmd::Update(a) => commands::update::exec(services, a).await,
 	}
 }
 

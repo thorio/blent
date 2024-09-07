@@ -10,6 +10,7 @@ repository = "https://github.com/thorio/blent"
 [dependencies]
 anyhow = "1.0.86"
 bollard = "0.17.0"
+bytesize = "1.3.0"
 chrono = { version = "0.4.38", default-features = false }
 chrono-humanize = "0.2.3"
 clap = { version = "4.5.4", features = ["derive"] }
