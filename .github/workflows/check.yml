@@ -1,0 +1,26 @@
+name: check
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "develop" ]
+
+env:
+  RUSTDOCFLAGS: "-D warnings"
+  RUSTFLAGS: "-D warnings"
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: setup rust cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: install rust tools
+        run: cargo install --debug cargo-make
+
+      - name: check
+        run: cargo make --no-workspace ci-check

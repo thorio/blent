@@ -4,4 +4,4 @@ Version: 0.0.0-dev
 Maintainer: thorou <thorou@chirality.de>
 Section: x11
 Priority: extra
-Description: Cross-platform application launcher for Linux and Windows
+Description: CLI for managing multiple docker-compose projects

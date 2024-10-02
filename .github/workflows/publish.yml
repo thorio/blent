@@ -6,10 +6,13 @@ on:
 
 jobs:
   ubuntu:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:
+      - name: install rust tools
+        run: cargo install --debug cargo-make
+
       - name: checkout repository
         uses: actions/checkout@v4
         with:
@@ -17,7 +20,45 @@ jobs:
           fetch-tags: true
 
       - name: build and package
-        run: cargo make deb
+        run: cargo make --no-workspace ci-ubuntu
+
+      - name: upload packages
+        uses: svenstaro/upload-release-action@v2
+        with:
+          file_glob: true
+          file: target/artifacts/*
+
+  arch:
+    runs-on: ubuntu-24.04
+    container:
+      image: archlinux
+    permissions:
+      contents: write
+    steps:
+      - name: install tools
+        run: pacman -Syu base-devel rustup git sudo --noconfirm
+
+      - name: setup build user
+        run: useradd builder -m
+
+      - name: install rust tools
+        shell: sudo -u builder bash {0}
+        run: |
+          rustup default stable
+          cargo install --debug cargo-make
+
+      - name: checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: fix permissions
+        run: chown -R builder:builder .
+
+      - name: build and package
+        shell: sudo -u builder bash {0}
+        run: cargo make --no-workspace ci-arch
 
       - name: upload packages
         uses: svenstaro/upload-release-action@v2

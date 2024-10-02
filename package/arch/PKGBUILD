@@ -1,0 +1,16 @@
+# Maintainer: thorou <thorou@chirality.de>
+
+pkgname=blent
+pkgver=0.0.0_dev # patched by CI
+pkgrel=1
+pkgdesc="CLI for managing multiple docker-compose projects"
+arch=("x86_64")
+url="https://github.com/thorio/$pkgname"
+license=("GPL3")
+options=("!strip" "!debug")
+
+package() {
+	reporoot=$(git rev-parse --show-toplevel)
+
+	install -Dm755 "$reporoot/target/release/blent" "$pkgdir/usr/bin/blent"
+}

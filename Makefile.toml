@@ -1,10 +1,28 @@
-# NOTE: grep is super old on github actions windows-2022 so don't use it without LC_ALL=en_US.utf8
+[config]
+skip_core_tasks = true
+
+[tasks.ci-check]
+script_runner = "sh"
+script = '''
+	cargo fmt --check
+	cargo clippy
+	cargo doc --no-deps --document-private-items
+	cargo test --verbose
+'''
+
+[tasks.ci-ubuntu]
+run_task = { name = ["release-deb", "release-tar"] }
+
+[tasks.ci-arch]
+run_task = { name = ["release-archpkg"] }
+
 [tasks.patch-version]
 script_runner = "sh"
 script = '''
 	sha=$(git rev-parse --short HEAD)
 	tag=$(git describe --tags --abbrev=0 --match 'v*' | sed 's/^v//')
 	sed -i "s/0.0.0-dev/$tag+$sha/" Cargo.toml
+	sed -i "s/0.0.0_dev/$(echo $tag | sed 's/-/_/g')/" package/arch/PKGBUILD
 	sed -i "s/0.0.0-dev/$tag/" package/debian/control
 '''
 
@@ -12,10 +30,32 @@ script = '''
 script_runner = "sh"
 script = "mkdir -p target/artifacts"
 
-[tasks.deb]
-dependencies = ["artifact-dropoff", "patch-version"]
+[tasks.build-release]
+command = "cargo"
+args = ["build", "--release"]
+
+[tasks.release-deb]
+dependencies = ["artifact-dropoff", "patch-version", "build-release"]
+script_runner = "sh"
 script = '''
-	cargo build --release
-	bash package/build.sh
-	mv package/*.deb target/artifacts/blent-x86_64.deb
+	bash package/debian/build.sh
+	cp -a package/debian/*.deb target/artifacts/blent-debian-x86_64.deb
+'''
+
+[tasks.release-tar]
+dependencies = ["artifact-dropoff", "patch-version", "build-release"]
+script_runner = "sh"
+script = '''
+	mkdir -p target/tmp/tar
+	cp LICENSE target/tmp/tar/LICENSE
+	cp target/release/blent target/tmp/tar/blent
+	(cd target/tmp/tar && tar czf ../../artifacts/blent-linux-x86_64.tar.gz .)
+'''
+
+[tasks.release-archpkg]
+dependencies = ["patch-version", "artifact-dropoff", "build-release"]
+script_runner = "sh"
+script = '''
+	(cd package/arch && makepkg -Cf)
+	cp -a package/arch/*.pkg.tar.zst target/artifacts/blent-arch-x86_64.pkg.tar.zst
 '''
