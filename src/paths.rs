@@ -9,7 +9,7 @@ fn home() -> PathBuf {
 pub fn default_apps() -> PathBuf {
 	let mut path = home();
 
-	path.push("apps");
+	path.push("app");
 
 	path
 }
