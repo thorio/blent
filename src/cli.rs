@@ -35,7 +35,7 @@ pub struct Args {
 
 #[derive(clap::Args, Debug)]
 pub struct GlobalArgs {
-	/// Directory in which to look for stacks [default: ~/apps]
+	/// Directory in which to look for stacks [default: ~/app]
 	#[arg(long, value_name = "PATH", global = true)]
 	pub app_path: Option<PathBuf>,
 }

@@ -14,6 +14,7 @@ use std::process::ExitCode;
 /// Print a summary of stacks
 #[derive(clap::Args, Debug)]
 pub struct Args {
+	/// Operate only on matching services. Format: "stack:service"
 	filter: Vec<ServiceFilter>,
 
 	/// Show details about services
