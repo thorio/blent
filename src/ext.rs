@@ -86,3 +86,12 @@ pub trait IterExt: Iterator + Sized {
 }
 
 impl<T: Iterator> IterExt for T {}
+
+pub trait Tap: Sized {
+	fn tap(mut self, f: impl FnOnce(&mut Self)) -> Self {
+		f(&mut self);
+		self
+	}
+}
+
+impl<T> Tap for T {}

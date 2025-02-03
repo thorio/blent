@@ -1,3 +1,4 @@
+use crate::ext::Tap;
 use std::{env, path::PathBuf};
 
 fn home() -> PathBuf {
@@ -6,10 +7,12 @@ fn home() -> PathBuf {
 	PathBuf::from(home)
 }
 
-pub fn default_apps() -> PathBuf {
-	let mut path = home();
+pub fn app() -> PathBuf {
+	let env = env::var("BLENT_APP_PATH").ok().map(PathBuf::from);
 
-	path.push("app");
+	env.unwrap_or_else(default_app)
+}
 
-	path
+fn default_app() -> PathBuf {
+	home().tap(|p| p.push("app"))
 }

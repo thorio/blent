@@ -26,7 +26,7 @@ pub struct Compose {
 
 impl Compose {
 	pub fn new(args: &GlobalArgs) -> Result<Self> {
-		let app_path = args.app_path.as_ref().map_or_else(paths::default_apps, Clone::clone);
+		let app_path = args.app_path.clone().unwrap_or_else(paths::app);
 
 		if !app_path.is_dir() {
 			bail!("app directory '{}' does not exist", app_path.to_string_lossy())
