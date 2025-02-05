@@ -6,7 +6,7 @@ use bytesize::ByteSize;
 use color_eyre::owo_colors::OwoColorize;
 use std::process::ExitCode;
 
-/// Create and start stacks
+/// Update stack images
 #[derive(clap::Args, Debug)]
 pub struct Args {
 	#[command(flatten)]
