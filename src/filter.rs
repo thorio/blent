@@ -1,4 +1,4 @@
-use anyhow::{anyhow, bail};
+use anyhow::bail;
 use itertools::Itertools;
 use std::str::FromStr;
 
@@ -94,41 +94,6 @@ impl FromStr for ServiceFilter {
 		Ok(Self {
 			stack: stack.to_owned(),
 			service: service.map(str::to_owned),
-		})
-	}
-}
-
-#[derive(Debug, Clone)]
-pub struct ServiceDescriptor {
-	pub stack: String,
-	pub service: String,
-}
-
-impl FilterService for ServiceDescriptor {
-	fn filter(&self, service: &impl IdentifyService) -> bool {
-		self.stack == service.stack() && self.service == service.service()
-	}
-}
-
-impl IdentifyService for ServiceDescriptor {
-	fn stack(&'_ self) -> &'_ str {
-		&self.stack
-	}
-
-	fn service(&'_ self) -> &'_ str {
-		&self.service
-	}
-}
-
-impl FromStr for ServiceDescriptor {
-	type Err = anyhow::Error;
-
-	fn from_str(s: &str) -> Result<Self, Self::Err> {
-		let filter = ServiceFilter::from_str(s)?;
-
-		Ok(Self {
-			stack: filter.stack,
-			service: filter.service.ok_or_else(|| anyhow!("no service specified"))?,
 		})
 	}
 }
