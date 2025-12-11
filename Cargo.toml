@@ -8,22 +8,22 @@ authors = ["thorou"]
 repository = "https://github.com/thorio/blent"
 
 [dependencies]
-anyhow = "1.0.95"
-bollard = "0.18.1"
-bytesize = "1.3.0"
-chrono = { version = "0.4.39", default-features = false }
+anyhow = "1.0.100"
+bollard = "0.19.4"
+bytesize = "2.3.1"
+chrono = { version = "0.4.42", default-features = false }
 chrono-humanize = "0.2.3"
-clap = { version = "4.5.27", features = ["derive"] }
-clap-verbosity-flag = "3.0.0"
-color-eyre = "0.6.3"
-comfy-table = "7.1.3"
+clap = { version = "4.5.53", features = ["derive"] }
+clap-verbosity-flag = "3.0.4"
+color-eyre = "0.6.5"
+comfy-table = "7.2.1"
 itertools = "0.14.0"
-log = "0.4.25"
-owo-colors = "4.1.0"
-serde = { version = "1.0.217", features = ["derive"] }
+log = "0.4.29"
+owo-colors = "4.2.3"
+serde = { version = "1.0.228", features = ["derive"] }
 serde-saphyr = "0.0.10"
 stderrlog = { version = "0.6.0", default-features = false }
-tokio = { version = "1.43.0", features = ["macros"] }
+tokio = { version = "1.48.0", features = ["macros"] }
 
 [profile.release]
 strip = true

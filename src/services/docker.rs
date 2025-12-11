@@ -1,11 +1,14 @@
 use crate::{cli::GlobalArgs, ext::IterExt, filter::IdentifyService};
 use anyhow::anyhow;
-use bollard::{container::ListContainersOptions, errors::Error as BollardError, secret::ContainerSummary};
+use bollard::{
+	errors::Error as BollardError,
+	query_parameters::{ListContainersOptions, PruneImagesOptions},
+	secret::{ContainerSummary, ContainerSummaryStateEnum},
+};
 use itertools::Itertools;
 
 const COMPOSE_PROJECT_LABEL: &str = "com.docker.compose.project";
 const COMPOSE_SERVICE_LABEL: &str = "com.docker.compose.service";
-const DOCKER_STATE_RUNNING: &str = "running";
 
 pub struct Docker {
 	bollard: bollard::Docker,
@@ -19,7 +22,7 @@ impl Docker {
 	}
 
 	pub async fn services(&self) -> Result<impl Iterator<Item = Service>, BollardError> {
-		let options = ListContainersOptions::<String> {
+		let options = ListContainersOptions {
 			all: true,
 			..Default::default()
 		};
@@ -38,7 +41,7 @@ impl Docker {
 	}
 
 	pub async fn prune_images(&self) -> Result<PruneSuccess, BollardError> {
-		let response = self.bollard.prune_images::<String>(None).await?;
+		let response = self.bollard.prune_images(None::<PruneImagesOptions>).await?;
 
 		let pruned_images = response
 			.images_deleted
@@ -89,7 +92,7 @@ impl TryFrom<ContainerSummary> for Service {
 			.ok_or_else(|| anyhow!("no project label"))?;
 
 		let status = value.status.ok_or_else(|| anyhow!("no status"))?;
-		let running = value.state.ok_or_else(|| anyhow!("no state"))? == DOCKER_STATE_RUNNING;
+		let running = value.state.ok_or_else(|| anyhow!("no state"))? == ContainerSummaryStateEnum::RUNNING;
 		let image = value.image.ok_or_else(|| anyhow!("no image"))?;
 		let created = value.created.ok_or_else(|| anyhow!("no created date"))?;
 
