@@ -139,7 +139,7 @@ fn read_compose_file(path: PathBuf) -> Result<(String, ComposeFile)> {
 		.into_owned();
 
 	let file = fs::File::open(&path).map_err(|e| anyhow!("{e} ({path:?})"))?;
-	let compose_file: ComposeFile = serde_yml::from_reader(file)?;
+	let compose_file: ComposeFile = serde_saphyr::from_reader(file)?;
 
 	Ok((stack, compose_file))
 }

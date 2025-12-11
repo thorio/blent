@@ -21,7 +21,7 @@ itertools = "0.14.0"
 log = "0.4.25"
 owo-colors = "4.1.0"
 serde = { version = "1.0.217", features = ["derive"] }
-serde_yml = "0.0.12"
+serde-saphyr = "0.0.10"
 stderrlog = { version = "0.6.0", default-features = false }
 tokio = { version = "1.43.0", features = ["macros"] }
 
