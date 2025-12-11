@@ -121,7 +121,7 @@ fn running_count(services: &[ServiceStatus]) -> usize {
 		.filter_count(|s| s.daemon.as_ref().is_some_and(|s| s.running))
 }
 
-pub async fn get_stacks(
+async fn get_stacks(
 	services: &Services,
 	filter: &[ServiceFilter],
 ) -> Result<impl Iterator<Item = StackDescriptor<ServiceStatus>>> {

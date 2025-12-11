@@ -47,6 +47,9 @@ pub enum Command {
 	Down(commands::down::Args),
 	Logs(commands::logs::Args),
 	Update(commands::update::Args),
+
+	#[command(hide = true)]
+	Complete(commands::complete::Args),
 }
 
 #[derive(clap::Args, Debug)]

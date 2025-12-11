@@ -1,3 +1,4 @@
+pub mod complete;
 pub mod down;
 pub mod logs;
 pub mod status;
