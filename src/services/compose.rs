@@ -144,7 +144,7 @@ fn read_compose_file(path: PathBuf) -> Result<(String, ComposeFile)> {
 	Ok((stack, compose_file))
 }
 
-fn get_stack_name(compose_path: &Path) -> Option<Cow<str>> {
+fn get_stack_name(compose_path: &'_ Path) -> Option<Cow<'_, str>> {
 	Some(compose_path.parent()?.file_name()?.to_string_lossy())
 }
 
